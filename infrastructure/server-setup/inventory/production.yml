@@ -39,7 +39,7 @@ all:
 docker-manager-first:
   hosts:
     prod-01: # @todo set this to be the hostname of your target server
-      ansible_host: '22.22.22.22' # @todo set this to be the hostname of your target server
+      ansible_host: '138.199.197.238' # @todo set this to be the hostname of your target server
       data_label: data1
       # If you are using a jump server to access this environment, enter other SSH args here.
       # ansible_ssh_common_args: '-J jump@55.55.55.55 -o StrictHostKeyChecking=no' # @todo set this to be the IP address of your jump server
@@ -48,16 +48,17 @@ docker-manager-first:
 # This should depend on the size of your country and the number of end users.
 # If you are only using one production worker for very small countries or small pilot projects, replace with an empty block like so: docker-workers: {}
 docker-workers:
-  hosts:
-    prod-02: # @todo set this to be the hostname of your target server
-      ansible_host: '33.33.33.33'
-      # If you are using a jump server to access this environment, enter other SSH args here.
-      # ansible_ssh_common_args: '-J jump@55.55.55.55 -o StrictHostKeyChecking=no'
+  {}
+  # hosts:
+  #   prod-02: # @todo set this to be the hostname of your target server
+  #     ansible_host: "33.33.33.33"
+  #     # If you are using a jump server to access this environment, enter other SSH args here.
+  #     # ansible_ssh_common_args: '-J jump@55.55.55.55 -o StrictHostKeyChecking=no'
 
 backups:
   hosts:
-    backup: # @todo set this to be the hostname of your backup server
-      ansible_host: '66.66.66.66'
+    pankajland-backup: # @todo set this to be the hostname of your backup server
+      ansible_host: '162.55.183.184'
       # Written by provision pipeline. Assumes "backup" environment
       # exists in Github environments
       ansible_ssh_private_key_file: /tmp/backup_ssh_private_key
