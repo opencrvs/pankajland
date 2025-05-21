@@ -40,7 +40,7 @@ all:
 
 docker-manager-first:
   hosts:
-    pankajland-staging: # @todo set this to be the hostname of your target server
+    pankaj-staging: # @todo set this to be the hostname of your target server
       ansible_host: '138.199.211.183' # @todo set this to be the hostname of your target server
       data_label: data1
       # If you are using a jump server to access this environment, enter other SSH args here.

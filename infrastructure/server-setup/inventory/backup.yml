@@ -29,5 +29,5 @@ all:
 
 backups-host:
   hosts:
-    pankajland-backup: # @todo set this to be the hostname of your backup server
+    pankaj-backup: # @todo set this to be the hostname of your backup server
       ansible_host: '162.55.183.184'
