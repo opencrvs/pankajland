@@ -1,68 +1,5 @@
-# pankajland-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankajland-qa.opencrvs.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ/OHAvEKA3xe79+GwM88BAgWto5sPwl3e5GscAJY7pP
-# pankajland-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankajland-qa.opencrvs.dev ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDSbPF/RuFllGjvV1SACaIqqmT/UZW2kvCBlamxWDzc7L5PmRLfF/qCuKo3UGSBbbfrWdWvNtZUizBuTyNAjYH0WzGS8xz8ESVN9XmMMmoVBqcBLFHHwA1aaFaKkIo+YJlfmtJtb+xgFZB7Le0sDJDZ0L7YDICTePLlwUfJEIIOOljkuxs6Rg7eRTOZcUuFwnzpG8X6WF0Pu+oSujClEJ+pPzXtbjkCrTPFFLmjii8u4F/dT7dpmWpDRuG0+bly7zfVqXaao6eKePFSn8JgtR4MIgDSpVSMjO3S4MaE44BxmlrLXQecdGfFEXygNU0GTg2HlD3mJoBQtkhVh4vNDSJrZ83xE8R+7+HPYBodMA7ThwOu1l6XFY3QMKqH/Awav2FG7//mYiSA1Yrkr7sHhyKAoGhPEq3N/pw3mu+2akAhdUoi7lwjwhSlCQZ98dioBg6Wt1YAjPxSOCxq2LAJ54KhGmiS6oSdZ/XW+e9vc5NBgLsCQDiDHwpZP4xDmG/IWcc=
-# pankajland-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankajland-qa.opencrvs.dev ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBK/Lkrxd+vrYKhDwo/7rYqES8dcMfrMCEQ5h9adlzUuaFV29vwr2bVyAwPzYdSeBkhabDhiKhAIXG/6u9Ig0ycg=
-# pankajland-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankajland-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 138.199.215.90:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-138.199.215.90 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ/OHAvEKA3xe79+GwM88BAgWto5sPwl3e5GscAJY7pP
-# 138.199.215.90:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 138.199.215.90:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-162.55.183.184 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC1dQQ3WlepgJK61I/E9cxw9mwxR6cJmTGhL0ELKayoVaSBbFSrFYiCfxX3S7DKbR2zuPhGRdwkZNU/ZITk0jp8oKod+mVS9EFkylaIbQEK3mUorGOPE1zl84SYdZ+ZDs5KLpGpx4iHIo/IxBN20f+sRQKrQkaQ8wLQUFwT5fnAB8pFYbSE1pU/U36Hhix4DeMIlDlKJDBcYg/SBk4q4n9QEbo5CvjePdFWP4aztVE3wjJGc4cPGhCXJ2ucC/zP8pCvcEppnUpWEzYIZNTITMLA39bhBlftlWyLUj1WF/9Mng4GvvCEDbVrCRiVJqcfZtiBKWO++/rs2Ls8rnQQ0vc8uNN6vmWpU9Yft0/eGa0xDlOyYg+fGy2cs8NOMTyUY2GHxk1DGw43MY/Relw4BVLqyqrUFN0tc1So0mAuabqEDsllQsIQ/elK3HCLuijWVLr15KhUy5se5uicUK6ffotIqXkZZjN6djWkdGSVV3LSctHyjTCa/lhMQ1T9zxxsxQU=
-# 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-162.55.183.184 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJjs7f7tK5tmyUi9mZKZQTy//yvzn2VGPfmoe6HCA5he8Oj2OzgmpDWcGae+vjKGuqJGTf25XixHS4irVmjyyEA=
-# 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-162.55.183.184 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPGOfZZ1XzMsh4V6ESs9YWkq66z5E+FJPjtyCVF1mtwS
-# 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankajland-staging.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankajland-staging.opencrvs.dev ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBAaQCsp7Ti/yPAoeUEZfRbgLfaHMviSwRIcZ0x7v/sLXXzJOUBaAHyFsFa691rIJ3FaDuJR5TnLlrIvYt7uJ/lI=
-# pankajland-staging.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankajland-staging.opencrvs.dev ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCndxBs0JLyULUbzAmedyHVyj3DYjMxFXV5p/t/53uaHRppFWSzFZr+jwOS0FyWxlMb//uNOQfo0fF2ctPVRHEkZYgt6B+Dt2UnHIzyDZBtqEH/veC1MbXA+VtG+BwWHzQAD2evhWGS+h3/v8Lbn3EkRu1FvfgAgQCx2+RYfKwLD8RUUXEaWUgNzQJvLRfFjaKGKOrHyw1OIc8aOX848gkH609g8WaLNFV2uKy68wDwyWnQly5Pq1zh3JjBJsfHLmyc9JnMnyBwY9DIcnrGJhU3E8L7AE+ZToVsbTRNh/jDuMu+YFJU+ecYlng9zti1UTOVBG3DsOnB+FOFzflyUhdvFXt0YvB9vtbdBGNhIqHXMqvu7vcJ9CuC2VjXN9k4WlMVgVtTDh5bOdmaj2ZjNFz45rTolEhl7PBho3IndaeycnH3epI+dkds6nmqhb/Je76XCpMhYQskF68mKMwOns6/Nw4mPSlw1WlQPdCcwRIVg4qBSS5R2yAca2ZngwSraKc=
-# pankajland-staging.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankajland-staging.opencrvs.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIFFmdNwlI6JbjlkpIQsx1cscWO3ixu5iKxgUEd/bxyz
-# pankajland-staging.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankajland-staging.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 138.199.211.183:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-138.199.211.183 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCndxBs0JLyULUbzAmedyHVyj3DYjMxFXV5p/t/53uaHRppFWSzFZr+jwOS0FyWxlMb//uNOQfo0fF2ctPVRHEkZYgt6B+Dt2UnHIzyDZBtqEH/veC1MbXA+VtG+BwWHzQAD2evhWGS+h3/v8Lbn3EkRu1FvfgAgQCx2+RYfKwLD8RUUXEaWUgNzQJvLRfFjaKGKOrHyw1OIc8aOX848gkH609g8WaLNFV2uKy68wDwyWnQly5Pq1zh3JjBJsfHLmyc9JnMnyBwY9DIcnrGJhU3E8L7AE+ZToVsbTRNh/jDuMu+YFJU+ecYlng9zti1UTOVBG3DsOnB+FOFzflyUhdvFXt0YvB9vtbdBGNhIqHXMqvu7vcJ9CuC2VjXN9k4WlMVgVtTDh5bOdmaj2ZjNFz45rTolEhl7PBho3IndaeycnH3epI+dkds6nmqhb/Je76XCpMhYQskF68mKMwOns6/Nw4mPSlw1WlQPdCcwRIVg4qBSS5R2yAca2ZngwSraKc=
-# 138.199.211.183:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-138.199.211.183 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBAaQCsp7Ti/yPAoeUEZfRbgLfaHMviSwRIcZ0x7v/sLXXzJOUBaAHyFsFa691rIJ3FaDuJR5TnLlrIvYt7uJ/lI=
-# 138.199.211.183:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-138.199.211.183 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIFFmdNwlI6JbjlkpIQsx1cscWO3ixu5iKxgUEd/bxyz
-# 138.199.211.183:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 138.199.211.183:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankajland-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankajland-prod.opencrvs.dev ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
-# pankajland-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankajland-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankajland-prod.opencrvs.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
-# pankajland-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankajland-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-95.217.0.65 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-95.217.0.65 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankaj-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankaj-qa.opencrvs.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
 # pankaj-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 pankaj-qa.opencrvs.dev ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
-# pankaj-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankaj-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankaj-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-95.217.0.65 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-95.217.0.65 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # pankaj-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # pankaj-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 pankaj-qa.opencrvs.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
@@ -73,16 +10,15 @@ pankaj-qa.opencrvs.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAj
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 95.217.0.65 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
-# pankaj-qa.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankaj-qa.opencrvs.dev ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
+# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
+# 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 162.55.183.184 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC1dQQ3WlepgJK61I/E9cxw9mwxR6cJmTGhL0ELKayoVaSBbFSrFYiCfxX3S7DKbR2zuPhGRdwkZNU/ZITk0jp8oKod+mVS9EFkylaIbQEK3mUorGOPE1zl84SYdZ+ZDs5KLpGpx4iHIo/IxBN20f+sRQKrQkaQ8wLQUFwT5fnAB8pFYbSE1pU/U36Hhix4DeMIlDlKJDBcYg/SBk4q4n9QEbo5CvjePdFWP4aztVE3wjJGc4cPGhCXJ2ucC/zP8pCvcEppnUpWEzYIZNTITMLA39bhBlftlWyLUj1WF/9Mng4GvvCEDbVrCRiVJqcfZtiBKWO++/rs2Ls8rnQQ0vc8uNN6vmWpU9Yft0/eGa0xDlOyYg+fGy2cs8NOMTyUY2GHxk1DGw43MY/Relw4BVLqyqrUFN0tc1So0mAuabqEDsllQsIQ/elK3HCLuijWVLr15KhUy5se5uicUK6ffotIqXkZZjN6djWkdGSVV3LSctHyjTCa/lhMQ1T9zxxsxQU=
 # 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 162.55.183.184 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJjs7f7tK5tmyUi9mZKZQTy//yvzn2VGPfmoe6HCA5he8Oj2OzgmpDWcGae+vjKGuqJGTf25XixHS4irVmjyyEA=
 # 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 162.55.183.184 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPGOfZZ1XzMsh4V6ESs9YWkq66z5E+FJPjtyCVF1mtwS
-# 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # 162.55.183.184:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # pankaj-staging.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 pankaj-staging.opencrvs.dev ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
@@ -95,18 +31,20 @@ pankaj-staging.opencrvs.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUm
 95.217.0.65 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
+95.217.0.65 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankaj-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
+# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # pankaj-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 pankaj-prod.opencrvs.dev ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
 # pankaj-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # pankaj-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
+pankaj-prod.opencrvs.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
+# pankaj-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
+# pankaj-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
+# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
+95.217.0.65 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
 95.217.0.65 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-# pankaj-prod.opencrvs.dev:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-pankaj-prod.opencrvs.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbC1ay9nGoCbUUmV3PAjmU496aXWNPE+5RQWuVc55DL
-# 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
-95.217.0.65 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtUzYHUN2aR+rLUOcYEJkg8pFL4ut18Kpoyfu9eaQ2Ba8D/VJqGoRCGK0X4SovUdUKzDExAy7OlfBO9j3MFxeLkirivyuA5BtzBX0ZbNYeZBu9WXO4uAGsWkMLSwsjrVlpYH2z+ZCfJIEDsb9VWjW8Lu8ue8UHo6445asTV9oEir3Eg8YZqkBimRdmgSi6cDBUlMCOjo85aeZ5LMHtYYCXrWMtGAfG8CEzAUluy0ZmbttNuDhwqCshmFeXY6bfoOfomCOSQme4JfUU+RcSCWyGPrMDIhJYYcgOE/kZRvrVQ+E31iDI5Mu+HPbRcDp4JT7krGHIQJaTw/cRXJoj6DoPfumbNzeK6qFG1JVt8d0pMtyBmsY1snAHsSubtKQYav8jykl9CVhTrcve4KqDz7/A5olrITzVPsmkdvo2TseiJkk7rdeRVBBOwN+7aZM8LnejEpk+rcAn6P8K+TVUqKMIP7EkVcSYpt8hAgZI8YeoP+Kg+lQkwOt7ljPpm1qhbrk=
 # 95.217.0.65:22 SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.11
