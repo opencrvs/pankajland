@@ -45,7 +45,7 @@ jobs:
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
-          node-version-file: base/.nvmrc
+          node-version-file: .nvmrc
 
       - name: Install dependencies
         working-directory: ./opencrvs-core
