@@ -1,4 +1,5 @@
 
+#!/bin/bash
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -18,8 +19,21 @@ print_usage_and_exit () {
     echo ""
     echo "If your Elasticsearch is password protected, an admin user's credentials can be given as environment variables:"
     echo "ELASTICSEARCH_ADMIN_USER=your_user ELASTICSEARCH_ADMIN_PASSWORD=your_pass"
+    echo ""
+    echo "Postgres admin user credentials must be given as environment variables:"
+    echo "POSTGRES_USER=your_user POSTGRES_PASSWORD=your_pass"
     exit 1
 }
+
+if [ -z "${POSTGRES_USER:-}" ]; then
+    echo 'Error: POSTGRES_USER environment variable must be set.'
+    print_usage_and_exit
+fi
+
+if [ -z "${POSTGRES_PASSWORD:-}" ]; then
+    echo 'Error: POSTGRES_PASSWORD environment variable must be set.'
+    print_usage_and_exit
+fi
 
 if [ -z "$1" ] ; then
     echo 'Error: Argument REPLICAS is required in position 1.'
@@ -74,6 +88,8 @@ drop_database () {
 #---------------------------
 drop_database hearth-dev;
 
+drop_database events;
+
 drop_database openhim-dev;
 
 drop_database user-mgnt;
@@ -86,7 +102,14 @@ drop_database performance;
 
 # Delete all data from elasticsearch
 #-----------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elasticsearch_host)/ocrvs" -v
+indices=$(docker run --rm --network=$NETWORK appropriate/curl curl -sS -XGET "http://$(elasticsearch_host)/_cat/indices?h=index")
+echo "--------------------------"
+echo "🧹 cleanup for indices from $(elasticsearch_host): $indices"
+echo "--------------------------"
+for index in ${indices[@]}; do
+  echo "Removing index $index"
+  docker run --rm --network=$NETWORK appropriate/curl curl -sS -XDELETE "http://$(elasticsearch_host)/$index"
+done
 
 # Delete all data from metrics
 #-----------------------------
@@ -94,13 +117,44 @@ docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxd
 
 # Delete all data from minio
 #-----------------------------
-docker run --rm --network=$NETWORK --entrypoint=/bin/sh minio/mc -c "\
+docker run --rm --network=$NETWORK --entrypoint=/bin/sh minio/mc:RELEASE.2025-05-21T01-59-54Z -c "\
   mc alias set myminio http://minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD && \
   mc rm --recursive --force myminio/ocrvs && \
   mc rb myminio/ocrvs && \
   mc mb myminio/ocrvs"
 
-# Restart the metabase service
-#-----------------------------
-docker service scale opencrvs_dashboards=0
-docker service scale opencrvs_dashboards=1
+# Delete all data from PostgreSQL
+#-------------------------------
+
+POSTGRES_DB="events"
+ANALYTICS_POSTGRES_DB="analytics"
+EVENTS_MIGRATOR_ROLE="events_migrator"
+EVENTS_APP_ROLE="events_app"
+ANALYTICS_POSTGRES_ROLE=${ANALYTICS_POSTGRES_USER:-"events_analytics"}
+
+echo "🔁 Dropping database '${POSTGRES_DB}' and roles..."
+
+docker run --rm --network=$NETWORK  \
+  -e PGPASSWORD="${POSTGRES_PASSWORD}" \
+  -e POSTGRES_USER="${POSTGRES_USER}" \
+  -e POSTGRES_DB="${POSTGRES_DB}" \
+  -e EVENTS_MIGRATOR_ROLE="${EVENTS_MIGRATOR_ROLE}" \
+  -e EVENTS_APP_ROLE="${EVENTS_APP_ROLE}" \
+  -e ANALYTICS_POSTGRES_ROLE="${ANALYTICS_POSTGRES_ROLE}" \
+  -e ANALYTICS_POSTGRES_DB="${ANALYTICS_POSTGRES_DB}" \
+  postgres:17.6 bash -c '
+psql -h postgres -U "$POSTGRES_USER" -d postgres -v ON_ERROR_STOP=1 <<EOF
+DROP DATABASE IF EXISTS "$POSTGRES_DB" WITH (FORCE);
+DROP DATABASE IF EXISTS "$ANALYTICS_POSTGRES_DB" WITH (FORCE);
+
+DROP ROLE IF EXISTS "$EVENTS_MIGRATOR_ROLE";
+DROP ROLE IF EXISTS "$EVENTS_APP_ROLE";
+DROP ROLE IF EXISTS "$ANALYTICS_POSTGRES_ROLE";
+EOF
+'
+echo "✅ Database and roles dropped."
+echo "🚀 Reinitializing Postgres with on-deploy.sh..."
+
+docker service update --force opencrvs_postgres-on-update
+
+echo "✅ All data cleared."

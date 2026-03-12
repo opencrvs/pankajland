@@ -14,7 +14,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <br>
-
+<br>
 **This is the fictional country "Farajaland" OpenCRVS country configuration repository for [OpenCRVS](https://github.com/opencrvs/opencrvs-core) You must fork this for your own country.**
 
 <a href="https://documentation.opencrvs.org/setup/3.-installation/3.2-set-up-your-own-country-configuration">Read our documentation</a> to learn how to set up your own country configuration using this repo as an example.
@@ -23,19 +23,34 @@
 
 This is an example country configuration package for the OpenCRVS core. OpenCRVS requires a country configuration in order to run.
 
-OpenCRVS is designed to be highly configurable for your country needs. It achieves this by seeding reference data that it needs from this module and exposing APIs for certain business critical operations. 
+OpenCRVS is designed to be highly configurable for your country needs. It achieves this by seeding reference data that it needs from this module and exposing APIs for certain business critical operations.
 
 This module also provides a logical location where you may wish to store the code and run the servers for any custom API integrations, extension modules and innovations to OpenCRVS.
 
 ## How do I run the module alongside the OpenCRVS core?
 
-1. Ensure that you are running [OpenCRVS Core](https://github.com/opencrvs/opencrvs-core).  
+1. Ensure that you are running [OpenCRVS Core](https://github.com/opencrvs/opencrvs-core).
 
-**If you successfully ran the `bash setup.sh` script in OpenCRVS Core you already have this module checked out, the dependencies are installed, the Farajaland database is populated and you can just run the following command.** 
+**If you successfully ran the `bash setup.sh` script in OpenCRVS Core you already have this module checked out, the dependencies are installed, the Farajaland database is populated and you can just run the following command.**
 
 2. `yarn dev`
 
 Thats it! 🎉
+
+## Database Management
+
+The country configuration includes scripts for managing analytics and metabase databases during development and deployment.
+
+### Development Database Management
+
+- `yarn db:clear:all` - Clears all development databases including:
+  - PostgreSQL analytics schema and data
+The script is designed to be extended by country implementations to clear additional custom databases as needed.
+
+### Production Database Management
+
+For deployed environments, analytics data is cleared when the "reset data" pipeline is triggered, which uses the `infrastructure/clear-all-data.sh` script. This script now includes clearing of:
+- **Metabase analytics database** - Both the PostgreSQL analytics schema and Metabase H2 configuration database
 
 ## What is in the Farajaland configuration module repository?
 
@@ -57,7 +72,7 @@ When the OpenCRVS Core servers start up with un-seeded databases they call the f
 
 1. `GET /application-config`
 
-- Configures general application settings 
+- Configures general application settings
 
 2. `GET /users`
 
@@ -123,3 +138,6 @@ When the OpenCRVS Core servers start up with un-seeded databases they call the f
 
 **<a href="https://documentation.opencrvs.org">Read our documentation</a> in order to learn how to make your own country configuration!**
 
+## Action Confirmation
+
+The Action Confirmation is a feature of OpenCRVS that allows for asynchronous confirmation of event actions. See documentation here: [Action Confirmation](./src/api/action-confirmation.md)

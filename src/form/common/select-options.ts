@@ -320,7 +320,7 @@ export const mannerOfDeathOptions: ISelectOption[] = [
   }
 ]
 
-export const maritalStatusOptions: ISelectOption[] = [
+export const maritalStatusOptions = [
   {
     value: 'SINGLE',
     label: {
@@ -371,7 +371,7 @@ export const maritalStatusOptions: ISelectOption[] = [
   }
 ]
 
-export const typeOfMarriageOptions: ISelectOption[] = [
+export const typeOfMarriageOptions = [
   {
     value: 'MONOGAMY',
     label: formMessageDescriptors.monogamy
@@ -382,7 +382,7 @@ export const typeOfMarriageOptions: ISelectOption[] = [
   }
 ]
 
-export const educationalAttainmentOptions: ISelectOption[] = [
+export const educationalAttainmentOptions = [
   {
     value: 'NO_SCHOOLING',
     label: {

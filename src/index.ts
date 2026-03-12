@@ -11,25 +11,26 @@
 require('app-module-path').addPath(require('path').join(__dirname))
 require('dotenv').config()
 
-import fetch from 'node-fetch'
+import StreamArray from 'stream-json/streamers/StreamArray'
 import path from 'path'
 import * as Hapi from '@hapi/hapi'
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
 import * as inert from '@hapi/inert'
 import * as Sentry from 'hapi-sentry'
+import fetch from 'node-fetch'
 import {
   CLIENT_APP_URL,
   DOMAIN,
   LOGIN_URL,
-  SENTRY_DSN
-} from '@countryconfig/constants'
-import {
+  SENTRY_DSN,
   COUNTRY_CONFIG_HOST,
   COUNTRY_CONFIG_PORT,
   CHECK_INVALID_TOKEN,
   AUTH_URL,
-  DEFAULT_TIMEOUT
+  DEFAULT_TIMEOUT,
+  GATEWAY_URL,
+  THIRTY_MINUTES_IN_MILLISECONDS
 } from '@countryconfig/constants'
 import {
   contentHandler,
@@ -39,12 +40,7 @@ import { eventRegistrationHandler } from '@countryconfig/api/event-registration/
 import decode from 'jwt-decode'
 import { join } from 'path'
 import { logger } from '@countryconfig/logger'
-import {
-  emailHandler,
-  emailSchema,
-  notificationHandler,
-  notificationSchema
-} from './api/notification/handler'
+import { emailHandler, emailSchema } from './api/notification/handler'
 import { ErrorContext } from 'hapi-auth-jwt2'
 import { mapGeojsonHandler } from '@countryconfig/api/dashboards/handler'
 import { formHandler } from '@countryconfig/form'
@@ -63,9 +59,28 @@ import { fontsHandler } from './api/fonts/handler'
 import { recordNotificationHandler } from './api/record-notification/handler'
 import {
   getCustomEventsHandler,
-  onAnyActionHandler,
-  onRegisterHandler
+  onAnyActionHandler
 } from '@countryconfig/api/custom-event/handler'
+import {
+  ActionDocument,
+  ActionStatus,
+  ActionType,
+  EventDocument
+} from '@opencrvs/toolkit/events'
+import { Event } from './form/types/types'
+import { onRegisterHandler } from './api/registration'
+import { workqueueconfigHandler } from './api/workqueue/handler'
+import getUserNotificationRoutes from './config/routes/userNotificationRoutes'
+import {
+  importEvent,
+  importEvents,
+  importLocations,
+  syncLocationLevels,
+  syncLocationStatistics
+} from './analytics/analytics'
+import { getClient } from './analytics/postgres'
+import { env } from './environment'
+import { createClient } from '@opencrvs/toolkit/api'
 
 export interface ITokenPayload {
   sub: string
@@ -193,9 +208,16 @@ export async function createServer() {
     port: COUNTRY_CONFIG_PORT,
     routes: {
       cors: { origin: whitelist },
-      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
+      timeout: {
+        server: DEFAULT_TIMEOUT
+      },
+      payload: {
+        maxBytes: 52428800
+      }
     }
   })
+
+  server.listener.requestTimeout = THIRTY_MINUTES_IN_MILLISECONDS
 
   await server.register(getPlugins())
 
@@ -267,6 +289,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
+    // eslint-disable-next-line no-unused-vars
     handler: (request: any, h: any) => {
       // Perform any health checks and return true or false for success prop
       return {
@@ -439,21 +462,6 @@ export async function createServer() {
 
   server.route({
     method: 'POST',
-    path: '/notification',
-    handler: notificationHandler,
-    options: {
-      tags: ['api'],
-      auth: false,
-      validate: {
-        payload: notificationSchema
-      },
-      description:
-        'Handles sending either SMS or email using a predefined template file'
-    }
-  })
-
-  server.route({
-    method: 'POST',
     path: '/email',
     handler: emailHandler,
     options: {
@@ -478,6 +486,17 @@ export async function createServer() {
       auth: false,
       tags: ['api', 'application-config'],
       description: 'Returns default application configuration'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/workqueue',
+    handler: workqueueconfigHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'workqueue'],
+      description: 'Returns workqueue configurations'
     }
   })
 
@@ -551,34 +570,96 @@ export async function createServer() {
   })
 
   server.route({
+    method: 'POST',
+    path: '/reindex',
+    options: {
+      /*
+       * In deployed environments, the reindex path is blocked by Traefik.
+       * See docker-compose.deploy.yml for more details.
+       */
+      auth: false
+    },
+    handler: async (req, h) => {
+      if (!env.ANALYTICS_DATABASE_URL) {
+        logger.warn(
+          'Skipping reindex, no ANALYTICS_DATABASE_URL environment variable set.'
+        )
+        return h.response().code(200)
+      }
+
+      const batch = req.payload as EventDocument[]
+      const client = getClient()
+
+      try {
+        await client.transaction().execute(async (trx) => {
+          await importEvents(batch, trx)
+        })
+
+        await syncLocations(req)
+
+        logger.info(`Reindexed batch of ${batch.length} events into analytics.`)
+
+        return h.response().code(200)
+      } catch (e) {
+        logger.error(e)
+
+        return h.response({ error: 'Unexpected error' }).code(500)
+      }
+    }
+  })
+
+  server.route({
     method: 'GET',
     path: '/events',
     handler: getCustomEventsHandler,
     options: {
-      tags: ['api', 'custom-event'],
+      auth: false,
+      tags: ['api', 'events'],
       description: 'Serves custom events'
     }
   })
 
   server.route({
     method: 'POST',
-    path: '/events/TENNIS_CLUB_MEMBERSHIP/actions/register',
-    handler: onRegisterHandler,
+    path: '/trigger/events/{event}/actions/{action}',
+    handler: onAnyActionHandler,
     options: {
-      tags: ['api', 'custom-event'],
+      tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
   })
 
   server.route({
     method: 'POST',
-    path: '/events/{event}/actions/{action}',
-    handler: onAnyActionHandler,
+    path: `/trigger/events/${Event.TENNIS_CLUB_MEMBERSHIP}/actions/${ActionType.REGISTER}`,
+    handler: onRegisterHandler,
     options: {
-      tags: ['api', 'custom-event'],
+      tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
     }
   })
+
+  server.route({
+    method: 'POST',
+    path: `/trigger/events/${Event.Birth}/actions/${ActionType.REGISTER}`,
+    handler: onRegisterHandler,
+    options: {
+      tags: ['api', 'events'],
+      description: 'Receives notifications on event actions'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: `/trigger/events/${Event.Death}/actions/${ActionType.REGISTER}`,
+    handler: onRegisterHandler,
+    options: {
+      tags: ['api', 'events'],
+      description: 'Receives notifications on event actions'
+    }
+  })
+
+  server.route(getUserNotificationRoutes())
 
   server.ext({
     type: 'onRequest',
@@ -588,6 +669,69 @@ export async function createServer() {
     }
   })
 
+  server.ext('onPostHandler', async (request, h) => {
+    const response = request.response as Hapi.ResponseObject
+    const parsedPath = /^\/trigger\/events\/[^/]+\/actions\/([^/]+)$/.exec(
+      request.route.path
+    )
+
+    const actionType = parsedPath?.[1] as ActionType | null
+    const wasRequestForActionConfirmation =
+      actionType && request.method === 'post'
+    const wasActionAcceptedImmediately = response.statusCode === 200
+
+    if (wasRequestForActionConfirmation && wasActionAcceptedImmediately) {
+      const event = request.payload as EventDocument
+
+      const eventWithOptimisticallyApprovedLastAction = {
+        ...event,
+        actions: event.actions.map((action, index) =>
+          index === event.actions.length - 1
+            ? {
+                ...action,
+                status: ActionStatus.Accepted,
+                ...(actionType === ActionType.REGISTER
+                  ? {
+                      registrationNumber: (
+                        response.source as { registrationNumber: string }
+                      ).registrationNumber
+                    }
+                  : {})
+              }
+            : action
+        ) as ActionDocument[]
+      }
+
+      const client = getClient()
+      try {
+        await client.transaction().execute(async (trx) => {
+          await importEvent(eventWithOptimisticallyApprovedLastAction, trx)
+        })
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        throw error
+      }
+    }
+    return h.continue
+  })
+
+  let lastLocationSyncAt = 0
+  const ONE_HOUR_MS = 60 * 60 * 1000
+
+  async function syncLocations(req: Hapi.Request<Hapi.ReqRefDefaults>) {
+    const now = Date.now()
+    // Sync locations at most once per hour rather than every call
+    if (now - lastLocationSyncAt > ONE_HOUR_MS) {
+      const url = new URL('events', GATEWAY_URL).toString()
+      const apiClient = createClient(url, req.headers.authorization)
+      const locations = await apiClient.locations.list.query()
+      await importLocations(locations)
+      lastLocationSyncAt = now
+      logger.info('Reindex: locations synced into analytics.')
+    }
+  }
+
   async function stop() {
     await server.stop()
     server.log('info', 'server stopped')
@@ -595,10 +739,12 @@ export async function createServer() {
 
   async function start() {
     await server.start()
-    server.log(
-      'info',
-      `server started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
-    )
+    await syncLocationLevels()
+    await syncLocationStatistics()
+
+    const logMsg = `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
+    logger.info(logMsg)
+    server.log('info', logMsg)
   }
 
   return { server, start, stop }
