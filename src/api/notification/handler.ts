@@ -113,7 +113,7 @@ export function generateFailureLog({
   return
 }
 
-export async function sendUserNotification<T extends TriggerEvent>(
+async function sendUserNotification<T extends TriggerEvent>(
   event: T,
   payload: TriggerPayload[T]
 ) {

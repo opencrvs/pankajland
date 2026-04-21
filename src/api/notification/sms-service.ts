@@ -124,7 +124,7 @@ const compileMessages = async (
   return template(variables)
 }
 
-export const TriggerToSMSTemplate = {
+const TriggerToSMSTemplate = {
   ['user-created']: 'userCredentialsNotification',
   ['user-updated']: 'updateUserNameNotification',
   ['username-reminder']: 'retieveUserNameNotification',
