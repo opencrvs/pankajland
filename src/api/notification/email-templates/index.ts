@@ -42,8 +42,6 @@ const BaseVariables = z.object({
   countryLogo: z.string()
 })
 
-export type BaseVariables = z.infer<typeof BaseVariables>
-
 export const TriggerVariable = {
   [TriggerEvent.USER_CREATED]: z.object({
     firstname: z.string(),
@@ -91,31 +89,25 @@ export type TriggerVariable = {
   [T in TriggerEvent]: z.infer<(typeof TriggerVariable)[T]>
 }
 
-export const ChangePhoneNumberVariables = BaseVariables.extend({
+const ChangePhoneNumberVariables = BaseVariables.extend({
   firstNames: z.string(),
   authCode: z.string()
 })
-export type ChangePhoneNumberVariables = z.infer<
-  typeof ChangePhoneNumberVariables
->
+type ChangePhoneNumberVariables = z.infer<typeof ChangePhoneNumberVariables>
 
-export const ChangeEmailAddressVariables = BaseVariables.extend({
+const ChangeEmailAddressVariables = BaseVariables.extend({
   firstNames: z.string(),
   authCode: z.string()
 })
-export type ChangeEmailAddressVariables = z.infer<
-  typeof ChangeEmailAddressVariables
->
+type ChangeEmailAddressVariables = z.infer<typeof ChangeEmailAddressVariables>
 
-export const ApproveCorrectionVariables = BaseVariables.extend({
+const ApproveCorrectionVariables = BaseVariables.extend({
   firstNames: z.string(),
   lastName: z.string(),
   event: z.string(),
   trackingId: z.string()
 })
-export type ApproveCorrectionVariables = z.infer<
-  typeof ApproveCorrectionVariables
->
+type ApproveCorrectionVariables = z.infer<typeof ApproveCorrectionVariables>
 
 const RejectCorrectionVariables = ApproveCorrectionVariables.extend({
   reason: z.string()
