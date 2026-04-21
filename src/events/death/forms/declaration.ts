@@ -16,6 +16,7 @@ import { deathIntroduction } from './pages/introduction'
 import { documents } from './pages/documents'
 import { spouse } from './pages/spouse'
 import { eventDetails } from './pages/eventDetails'
+import { causeOfDeathDetails } from './pages/causeOfDeathDetails'
 
 export const DEATH_DECLARATION_REVIEW = {
   title: {
@@ -64,6 +65,7 @@ export const DEATH_DECLARATION_FORM = defineDeclarationForm({
     deathIntroduction,
     deceased,
     eventDetails,
+    causeOfDeathDetails,
     informant,
     spouse,
     documents

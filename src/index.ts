@@ -77,6 +77,8 @@ import { getClient } from './analytics/postgres'
 import { env } from './environment'
 import { createClient } from '@opencrvs/toolkit/api'
 import { Event } from './events/utils/types'
+import { syncReferenceData } from './data-seeding/reference-data/reference-data'
+import { causeOfDeathSearchHandler } from './data-seeding/reference-data/handler'
 
 export interface ITokenPayload {
   sub: string
@@ -505,6 +507,17 @@ export async function createServer() {
   })
 
   server.route({
+    method: 'GET',
+    path: '/causes-of-death',
+    handler: causeOfDeathSearchHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'search'],
+      description: 'Fuzzy search codes with source-based priority'
+    }
+  })
+
+  server.route({
     method: 'POST',
     path: `/trigger/events/{event}/actions/${ActionType.CUSTOM}`,
     handler: onCustomActionHandler,
@@ -654,6 +667,10 @@ export async function createServer() {
     await server.start()
     await syncLocationLevels()
     await syncLocationStatistics()
+
+    if (env.REFERENCE_DATA_DATABASE_URL) {
+      await syncReferenceData()
+    }
 
     logger.info(
       `Server successfully started on ${COUNTRY_CONFIG_HOST}:${COUNTRY_CONFIG_PORT}`
