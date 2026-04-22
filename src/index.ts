@@ -28,7 +28,8 @@ import {
   AUTH_URL,
   DEFAULT_TIMEOUT,
   GATEWAY_URL,
-  THIRTY_MINUTES_IN_MILLISECONDS
+  THIRTY_MINUTES_IN_MILLISECONDS,
+  UPLOADER_APP_URL
 } from '@countryconfig/constants'
 import {
   contentHandler,
@@ -172,7 +173,7 @@ async function getPublicKey(): Promise<string> {
 export async function createServer() {
   let whitelist: string[] = [DOMAIN]
   if (DOMAIN[0] !== '*') {
-    whitelist = [LOGIN_URL, CLIENT_APP_URL]
+    whitelist = [LOGIN_URL, CLIENT_APP_URL, UPLOADER_APP_URL]
   }
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({

@@ -1,0 +1,23 @@
+{
+  "name": "my-project",
+  "private": true,
+  "workspaces": [
+    "web-app",
+    "api"
+  ],
+  "scripts": {
+    "dev:frontend": "yarn workspace web-app dev",
+    "dev:backend": "yarn workspace api dev",
+    "start:backend": "yarn workspace api start",
+    "dev": "concurrently \"yarn dev:frontend\" \"yarn dev:backend\"",
+    "build": "yarn workspace web-app build"
+  },
+  "dependencies": {
+    "@opencrvs/toolkit": "1.9.11-rc.5ee5281"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "eslint": "^9.18.0",
+    "typescript": "^5.7.3"
+  }
+}
