@@ -210,7 +210,7 @@ export function CountryInteropResultsScreen({
                       <Icon className={`w-5 h-5 text-${color}-500`} />
                       <Text>
                         Record {result.rowIndex}
-                        {result.id && ` - Certificate: ${result.id}`}
+                        {result.id && `: ${result.id}`}
                       </Text>
                       <Badge color={color} variant="light" ml="auto">
                         {result.status}
