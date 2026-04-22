@@ -25,6 +25,14 @@ import { SourceCauseDeathType } from './eventDetails'
 
 const durationOptions = [
   {
+    value: 'Seconds',
+    label: {
+      id: 'unit.seconds',
+      defaultMessage: 'Seconds',
+      description: 'Seconds'
+    }
+  },
+  {
     value: 'Minutes',
     label: {
       id: 'unit.minutes',
@@ -101,7 +109,7 @@ function getLabelForCause(
       }
     case 'Other':
       return {
-        defaultMessage: `${index + 1}. Antecedent cause`,
+        defaultMessage: `${index + 1}. Other significant cause`,
         description: 'This is the label for the field',
         id: `${basePath}.label`
       }
@@ -152,7 +160,7 @@ function createSymptomFields(letter: CauseLetter) {
     const otherField = {
       id: `${basePath}.other`,
       type: FieldType.TEXTAREA,
-      required: false,
+      required: true,
       analytics: true,
       label: {
         defaultMessage:
