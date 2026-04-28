@@ -1395,6 +1395,7 @@ form.field.label.urban,,Urban,Urbain
 form.field.label.userAttachmentSection,,Signature,Signature
 form.field.label.userDevice,,Device,Dispositif
 form.field.label.userFirstName,,User's first name,Prénom de l'utilisateur
+form.field.label.userFullName,User's full English name,User's full name,Nom complet de l'utilisateur
 form.field.label.userSignatureAttachment,,User's signature,Signature de l'utilisateur
 form.field.label.userSignatureAttachmentDesc,,Ask the user to sign a piece of paper and then scan or take a photo,"Demandez à l'utilisateur de signer une feuille de papier, puis scannez ou prenez une photo."
 form.field.label.userSignatureAttachmentTitle,,Upload signature,Joindre la signature
@@ -2067,6 +2068,8 @@ sysAdHome.sendUsernameReminderInviteError,The label for error notification of se
 sysAdHome.sendUsernameReminderInviteModalMessage,Message for send username reminder,The user will receive a username reminder via an {deliveryMethod} sent to {recipient},L'utilisateur recevra un rappel de son nom d'utilisateur par un {deliveryMethod} envoyé à {recipient}.
 sysAdHome.sendUsernameReminderInviteModalTitle,Title for send username reminder,Send username reminder?,Envoyer un rappel de nom d'utilisateur ?
 sysAdHome.sendUsernameReminderInviteSuccess,The label for success notification of send username reminder,Username reminder sent to {name},Rappel de l'identifiant envoyé à {name}
+sysAdHome.toggleActivateStatusSuccess,The label for success notification when toggling user activate status,Updated {name}'s account status to "{status}",Statut du compte de {name} mis à jour en "{status}"
+sysAdHome.toggleActivateStatusError,The label for error notification when toggling user activate status,Failed to update {name}'s account status to "{status}",Échec de la mise à jour du statut du compte de {name} en "{status}"
 sysAdHome.user.audit.comments,The label for form field deactivate comments,Comments: ,Commentaires :
 sysAdHome.user.audit.deactiv.reasonInv,The label for radio option being investigated,Being investigated due to suspicious activity on their account,Fait l'objet d'une enquête en raison d'une activité suspecte sur son compte
 sysAdHome.user.audit.deactiv.reasonNotEmp,The label for radio option not employee,No longer an employee,N'est plus un employé
