@@ -10,17 +10,12 @@
  */
 
 import { applicationConfig } from '@countryconfig/api/application/application-config'
-import { tennisClubMembershipEvent } from '@countryconfig/events/tennis-club-membership'
-
-import { birthEvent } from '@countryconfig/events/birth'
-import { deathEvent } from '@countryconfig/events/death'
 import { logger } from '@countryconfig/logger'
 import {
   ActionConfig,
   ActionDocument,
   ActionStatus,
   ActionType,
-  AddressFieldValue,
   AdministrativeArea,
   EventConfig,
   EventDocument,
@@ -29,31 +24,24 @@ import {
   getCurrentEventState,
   Location
 } from '@opencrvs/toolkit/events'
-import { differenceInDays } from 'date-fns'
+
 import { ExpressionBuilder, Kysely } from 'kysely'
 import { chunk, pickBy } from 'lodash'
 import { getClient } from './postgres'
 import { getStatistics } from '@countryconfig/utils'
-import { COUNTRY_NAMES_BY_CODE } from './countries'
-import { Event } from '@countryconfig/events/utils'
+import { eventConfigs } from '@countryconfig/events'
+import { precalculateBirthEvent } from '@countryconfig/analytics/analytics-precalculations'
+import { Event } from '@countryconfig/events/utils/types'
 
 /**
- * You can control which events you want to track in analytics by adding them here.
+ * You can exclude events from analytics by setting 'analytics' property to 'false' in the event config.
  */
+const analyticsEventConfigs = eventConfigs.filter(
+  (event) => event.analytics === true
+)
+
 function findEventConfig(eventType: string) {
-  if (eventType === Event.Birth) {
-    return birthEvent
-  }
-
-  if (eventType === Event.TENNIS_CLUB_MEMBERSHIP) {
-    return tennisClubMembershipEvent
-  }
-
-  if (eventType === Event.Death) {
-    return deathEvent
-  }
-
-  return null
+  return analyticsEventConfigs.find((event) => event.id === eventType)
 }
 
 function getEventConfig(eventType: string) {
@@ -111,27 +99,6 @@ function getAnnotation(
   }
 }
 
-function getCountryPlaceOfBirthResolved(
-  declaration: ActionDocument['declaration']
-) {
-  const placeOfBirth =
-    'child.birthLocation.privateHome' in declaration
-      ? declaration['child.birthLocation.privateHome']
-      : 'child.birthLocation.other' in declaration
-        ? declaration['child.birthLocation.other']
-        : null
-
-  const maybeAddress = AddressFieldValue.safeParse(placeOfBirth)
-
-  if (!maybeAddress.success) {
-    return 'Farajaland'
-  }
-
-  const country = maybeAddress.data.country
-
-  return COUNTRY_NAMES_BY_CODE[country] || 'Farajaland'
-}
-
 function precalculateAdditionalAnalytics(
   action: ActionDocument,
   declaration: ActionDocument['declaration'],
@@ -140,20 +107,8 @@ function precalculateAdditionalAnalytics(
   /*
    * Example: precalculate age from action creation date and child's date of birth
    */
-
   if (eventConfig.id === Event.Birth) {
-    const createdAt = new Date(action.createdAt)
-    const childDoB = declaration['child.dob']
-    if (!childDoB) return action
-
-    return {
-      ...declaration,
-      'child.age.days': differenceInDays(
-        createdAt,
-        new Date(childDoB as string)
-      ),
-      'child.countryPlaceOfBirth': getCountryPlaceOfBirthResolved(declaration)
-    }
+    return precalculateBirthEvent(action, declaration)
   }
 
   return declaration
