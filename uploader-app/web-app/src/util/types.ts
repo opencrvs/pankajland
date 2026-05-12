@@ -1,9 +1,5 @@
 export type Role = 'Registrar'
 
-export interface CSVRow {
-  id: string;
-  [key: string]: string;
-}
 
 export interface ProcessingResult {
   rowIndex: number;
@@ -24,9 +20,7 @@ export interface ProcessingSummary {
 export interface ProcessingProgress {
   current: number;
   total: number;
-  currentCertificateKey: string;
-  currentStep: 'finding' | 'checking' | 'deciding' | 'complete';
-  stepDescription: string;
+  currentTrackingId: string;
 }
 
 export interface DatabaseRecord {
@@ -35,6 +29,17 @@ export interface DatabaseRecord {
   ucCode?: string;
   selectedCodes?: string;
   multipleCodes?: string;
+}
+
+export interface SpcCodingDatabaseRecord {
+  trackingId: string
+  status: string
+  ucCode: string
+  selectedCodes: string[]
+  multipleCodes: string[]
+  freeText: string
+  comments: string
+  processedBySystem: string
 }
 
 export interface RejectedRecord {

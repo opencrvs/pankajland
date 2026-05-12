@@ -1,12 +1,12 @@
 import { Button, Badge, Accordion, Text, Alert, Card, Group, ScrollArea } from '@mantine/core';
 import { CheckCircle, XCircle, AlertCircle, SkipForward, Database, Copy, AlertTriangle } from 'lucide-react';
-import { ProcessingSummary } from '../../util/types';
+import { ProcessingSummary, SpcCodingDatabaseRecord } from '../../util/types';
 import { RejectedRecord } from '../../util/types';
 import { useState } from 'react';
 
 interface CountryInteropResultsScreenProps {
   summary: ProcessingSummary;
-  rejectedRecords: RejectedRecord[];
+  rejectedRecords: SpcCodingDatabaseRecord[];
   onReturnToUpload: () => void;
 }
 
@@ -21,7 +21,7 @@ export function CountryInteropResultsScreen({
 
   const handleCopyRejectedList = () => {
     const text = rejectedRecords
-      .map((record) => `${record.trackingId}: ${record.reason}`)
+      .map((record) => `${record.trackingId}: ${record.comments}`)
       .join('\n');
     navigator.clipboard.writeText(text);
     setCopiedToClipboard(true);
@@ -172,7 +172,7 @@ export function CountryInteropResultsScreen({
                       <span className="font-mono text-sm text-red-900 font-semibold min-w-[120px]">
                         {record.trackingId}
                       </span>
-                      <span className="text-sm text-red-800">{record.reason}</span>
+                      <span className="text-sm text-red-800">{record.comments}</span>
                     </div>
                   </div>
                 ))}

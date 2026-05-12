@@ -1,14 +1,14 @@
 import { Button, Alert, ScrollArea, Text } from '@mantine/core';
 import { AlertCircle, Copy, CheckCircle, Database } from 'lucide-react';
 import { useState } from 'react';
-import { DatabaseRecord, RejectedRecord } from '../../util/types';
+import { DatabaseRecord, RejectedRecord, SpcCodingDatabaseRecord } from '../../util/types';
 
 
 
 interface CountryInteropUploadScreenProps {
-  readyRecords: DatabaseRecord[];
-  rejectedRecords: RejectedRecord[];
-  onProcessRecords: (readyRecords: DatabaseRecord[], rejectedRecords: RejectedRecord[]) => void;
+  readyRecords: SpcCodingDatabaseRecord[] | [];
+  rejectedRecords: SpcCodingDatabaseRecord[] | [];
+  onProcessRecords: (readyRecords: SpcCodingDatabaseRecord[] | [], rejectedRecords: SpcCodingDatabaseRecord[] | []) => void;
 }
 
 export function CountryInteropUploadScreen({
@@ -20,7 +20,7 @@ export function CountryInteropUploadScreen({
 
   const handleCopyRejectedList = () => {
     const text = rejectedRecords
-      .map((record) => `${record.trackingId}: ${record.reason}`)
+      .map((record) => `${record.trackingId}: ${record.comments}`)
       .join('\n');
     navigator.clipboard.writeText(text);
     setCopiedToClipboard(true);
@@ -45,11 +45,11 @@ export function CountryInteropUploadScreen({
         <div className="mb-6 flex justify-center">
           <Button
             onClick={handleProcessRecords}
-            disabled={readyRecords.length === 0 && rejectedRecords.length === 0}
+            disabled={readyRecords?.length === 0 && rejectedRecords.length === 0}
             size="lg"
             className="bg-green-700 hover:bg-green-800 text-white disabled:bg-gray-400"
           >
-            Process {readyRecords.length + rejectedRecords.length} Record{(readyRecords.length + rejectedRecords.length) !== 1 ? 's' : ''}
+            Process {readyRecords?.length || 0 + rejectedRecords.length} Record{(readyRecords?.length || 0 + rejectedRecords.length) !== 1 ? 's' : ''}
           </Button>
         </div>
 
@@ -59,11 +59,11 @@ export function CountryInteropUploadScreen({
             <Database className="text-green-700 mt-1" size={32} strokeWidth={1.5} />
             <div className="flex-1">
               <h2 className="text-xl text-green-900 mb-2">
-                {readyRecords.length} record{readyRecords.length !== 1 ? 's' : ''} ready to import
+                {readyRecords?.length} record{readyRecords?.length !== 1 ? 's' : ''} ready to import
               </h2>
               <p className="text-green-800">
-                {readyRecords.length > 0
-                  ? `${readyRecords.length} record${readyRecords.length !== 1 ? 's have' : ' has'} been encoded by the SPC Mortality Group and ${readyRecords.length !== 1 ? 'are' : 'is'} ready to be imported and added to existing registrations as corrections.`
+                {readyRecords &&readyRecords.length > 0
+                  ? `${readyRecords?.length} record${readyRecords?.length !== 1 ? 's have' : ' has'} been encoded by the SPC Mortality Group and ${readyRecords?.length !== 1 ? 'are' : 'is'} ready to be imported and added to existing registrations as corrections.`
                   : 'No records are currently available for import.'}
               </p>
             </div>
@@ -110,7 +110,7 @@ export function CountryInteropUploadScreen({
                       <span className="font-mono text-sm text-red-900 font-semibold min-w-[120px]">
                         {record.trackingId}
                       </span>
-                      <span className="text-sm text-red-800">{record.reason}</span>
+                      <span className="text-sm text-red-800">{record.comments}</span>
                     </div>
                   </div>
                 ))}

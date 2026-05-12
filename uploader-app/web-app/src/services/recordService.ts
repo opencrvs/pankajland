@@ -2,7 +2,7 @@ import { GATEWAY_HOST, COUNTRY_CONFIG_HOST } from '../util/constants'
 import { createClient } from '@opencrvs/toolkit/api'
 import { v4 as uuidv4 } from 'uuid'
 import { getDecodedToken } from './token'
-import { UserInfo, RecordsToEmail } from '../util/types'
+import { UserInfo, RecordsToEmail, SpcCodingDatabaseRecord } from '../util/types'
 // import fetch from 'node-fetch'
 
 export interface DeathRecord {
@@ -234,6 +234,31 @@ export async function getUserById(
     return null
   }
 }
+
+type SpcCodingApiResponse = {
+  results: SpcCodingDatabaseRecord[]
+}
+/**
+ * Fetch SPC Coded records from spc.coding table
+ */
+export async function getSPCCodedRecords(): Promise<SpcCodingDatabaseRecord[] | []> {
+  try {
+    const response = await fetch(
+      new URL('spc-coding', COUNTRY_CONFIG_HOST)
+    )
+
+    if (!response.ok) {
+      return []
+    }
+
+    const data: SpcCodingApiResponse = await response.json()
+
+    return data.results
+  } catch {
+    return []
+  }
+}
+
 
 /**
  * Extract the createdBy user ID from the DECLARED legal status

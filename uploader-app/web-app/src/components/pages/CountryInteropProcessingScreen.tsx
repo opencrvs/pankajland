@@ -7,53 +7,8 @@ interface CountryInteropProcessingScreenProps {
   currentProgress?: ProcessingProgress;
 }
 
-export function CountryInteropProcessingScreen({ currentProgress }: CountryInteropProcessingScreenProps) {
-  const [timeRemaining, setTimeRemaining] = useState<number>(0);
-
-  // Estimate time: ~2-3 seconds per row
-  const SECONDS_PER_ROW = 2.5;
-
-  useEffect(() => {
-    if (currentProgress) {
-      const remaining = currentProgress.total - currentProgress.current;
-      setTimeRemaining(Math.ceil(remaining * SECONDS_PER_ROW));
-    }
-  }, [currentProgress]);
-
-  // Countdown timer
-  useEffect(() => {
-    if (timeRemaining > 0) {
-      const timer = setInterval(() => {
-        setTimeRemaining(prev => Math.max(0, prev - 1));
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [timeRemaining]);
-
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-
-    if (mins > 0) {
-      return `${mins}m ${secs}s`;
-    }
-    return `${secs}s`;
-  };
-
-  const getStepIcon = (step: string) => {
-    switch(step) {
-      case 'finding':
-        return <Database className="w-5 h-5 text-blue-500" />;
-      case 'checking':
-        return <AlertCircle className="w-5 h-5 text-yellow-500" />;
-      case 'deciding':
-        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
-      default:
-        return <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />;
-    }
-  };
-
+export function CountryInteropProcessingScreen({ currentProgress }: { currentProgress: ProcessingProgress }) {
+  console.log('progress :>> ', currentProgress);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
       <div className="w-full max-w-2xl">
@@ -66,73 +21,47 @@ export function CountryInteropProcessingScreen({ currentProgress }: CountryInter
               <Text size="lg" className="mb-1">
                 Record {currentProgress.current} of {currentProgress.total}
               </Text>
-              {timeRemaining > 0 && (
-                <Text c="dimmed" size="sm">
-                  Estimated time remaining: {formatTime(timeRemaining)}
-                </Text>
-              )}
             </div>
           )}
         </div>
 
-        {/* Current Certificate Being Processed */}
-        {currentProgress && currentProgress.currentCertificateKey && (
+        {/* Current Record Being Processed */}
+        {currentProgress && currentProgress.currentTrackingId && (
           <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
             <Text size="sm" c="dimmed" className="mb-1">
               Currently processing:
             </Text>
             <Text size="lg" className="font-mono font-semibold">
-              {currentProgress.currentCertificateKey}
+              {currentProgress.currentTrackingId}
             </Text>
           </div>
         )}
 
         {/* Processing Steps */}
         <div className="space-y-3 mb-6">
-          <div className={`p-4 rounded-lg border-2 transition-all ${
-            currentProgress?.currentStep === 'finding'
-              ? 'bg-blue-50 border-blue-300'
-              : 'bg-gray-50 border-gray-200'
-          }`}>
+          <div className='p-4 rounded-lg border-2 transition-all bg-gray-50 border-gray-200'>
             <div className="flex items-center gap-3">
-              {getStepIcon('finding')}
+              <Database className="w-5 h-5 text-blue-500" />
               <div>
                 <Text className="font-medium">Finding record in database</Text>
-                {currentProgress?.currentStep === 'finding' && (
-                  <Text size="sm" c="dimmed">{currentProgress.stepDescription}</Text>
-                )}
               </div>
             </div>
           </div>
 
-          <div className={`p-4 rounded-lg border-2 transition-all ${
-            currentProgress?.currentStep === 'checking'
-              ? 'bg-yellow-50 border-yellow-300'
-              : 'bg-gray-50 border-gray-200'
-          }`}>
+          <div className='p-4 rounded-lg border-2 transition-all bg-gray-50 border-gray-200'>
             <div className="flex items-center gap-3">
-              {getStepIcon('checking')}
+              <AlertCircle className="w-5 h-5 text-yellow-500" />
               <div>
                 <Text className="font-medium">Checking record status</Text>
-                {currentProgress?.currentStep === 'checking' && (
-                  <Text size="sm" c="dimmed">{currentProgress.stepDescription}</Text>
-                )}
               </div>
             </div>
           </div>
 
-          <div className={`p-4 rounded-lg border-2 transition-all ${
-            currentProgress?.currentStep === 'deciding'
-              ? 'bg-green-50 border-green-300'
-              : 'bg-gray-50 border-gray-200'
-          }`}>
+          <div className='p-4 rounded-lg border-2 transition-all bg-gray-50 border-gray-200'>
             <div className="flex items-center gap-3">
-              {getStepIcon('deciding')}
+              <CheckCircle2 className="w-5 h-5 text-green-500" />
               <div>
                 <Text className="font-medium">Correcting or skipping</Text>
-                {currentProgress?.currentStep === 'deciding' && (
-                  <Text size="sm" c="dimmed">{currentProgress.stepDescription}</Text>
-                )}
               </div>
             </div>
           </div>

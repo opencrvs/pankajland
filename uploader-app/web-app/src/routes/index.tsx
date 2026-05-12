@@ -1,16 +1,16 @@
 import { MantineProvider } from '@mantine/core'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import '../styles/mantine.css'
 import { CountryInteropUploadScreen } from '../components/pages/CountryInteropUploadScreen'
-import { ProcessingSummary, CSVRow, ProcessingProgress, DatabaseRecord, RejectedRecord  } from '../util/types'
-import { processCSV } from '../util/csvProccessor'
-import { CountryInteropNoRecordsScreen } from '../components/pages/CountryInteropNoRecordsScreen'
+import { ProcessingSummary, SpcCodingDatabaseRecord  } from '../util/types'
+import { processRecords } from '../util/recordProccessor'
 import { CountryInteropProcessingScreen } from '../components/pages/CountryInteropProcessingScreen'
 import { CountryInteropResultsScreen } from '../components/pages/CountryInteropResultsScreen'
-import { mockReadyRecords, mockRejectedRecords } from '../util/mockOpenCRVS'
+import { getSPCCodedRecords } from '../services/recordService'
+import { CountryInteropNoRecordsScreen } from '../components/pages/CountryInteropNoRecordsScreen'
 
-type AppState = "upload" | "country-interop-upload" | "country-interop-no-records" | "processing" | "country-interop-processing" | "results" | "country-interop-results" | "error";
+type AppState =  "country-interop-upload" | "country-interop-no-records" | "country-interop-processing" | "country-interop-results" | "error";
 
 export const Route = createFileRoute('/')({
   component: HomeComponent
@@ -18,48 +18,39 @@ export const Route = createFileRoute('/')({
 
 function HomeComponent() {
   const [state, setState] = useState<AppState>("country-interop-upload");
-  const [currentProgress, setCurrentProgress] = useState<ProcessingProgress | undefined>();
+  const [progress, setProgress] = useState({
+    current: 0,
+    total: 0,
+    currentTrackingId: ''
+  })
   const [summary, setSummary] =
     useState<ProcessingSummary | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const handleProcessDatabaseRecords = async (readyRecords: DatabaseRecord[], rejectedRecords: RejectedRecord[]) => {
+ const [records, setRecords] = useState<SpcCodingDatabaseRecord[] | []>([]);
+
+useEffect(() => {
+  async function loadRecords() {
+    const records = await getSPCCodedRecords()
+    setRecords(records)
+  }
+  loadRecords()
+}, [])
+
+  const handleProcessDatabaseRecords = async (readyRecords: SpcCodingDatabaseRecord[], rejectedRecords: SpcCodingDatabaseRecord[]) => {
     try {
       setState("country-interop-processing");
       setErrorMessage("");
-      setCurrentProgress(undefined);
 
-      // Convert ready records to CSV format
-      const readyCsvRows: CSVRow[] = readyRecords.map((record) => ({
-        id: record.certificateKey,
-        CertificateKey: record.certificateKey,
-        UCCode: record.ucCode || "",
-        SelectedCodes: record.selectedCodes || "",
-        MultipleCodes: record.multipleCodes || "",
-      }));
-
-      // Convert rejected records to CSV format (with empty codes since they're rejected)
-      const rejectedCsvRows: CSVRow[] = rejectedRecords.map((record) => ({
-        id: record.certificateKey,
-        CertificateKey: record.certificateKey,
-        UCCode: "",
-        SelectedCodes: "",
-        MultipleCodes: "",
-        RejectionReason: record.reason, // Add rejection reason as a field
-      }));
-
-      // Combine all records
-      const allCsvRows = [...readyCsvRows];
-
-      if (allCsvRows.length === 0) {
-        throw new Error("No records to process");
+      if (readyRecords.length === 0) {
+        setState("country-interop-processing");
       }
 
       // Process the records
-      const result = await processCSV(
-        allCsvRows,
-        (progress) => {
-          setCurrentProgress(progress);
+      const result = await processRecords(
+        readyRecords,
+        (current, total, currentTrackingId) => {
+          setProgress({ current, total, currentTrackingId });
         },
       );
 
@@ -77,8 +68,12 @@ function HomeComponent() {
   };
 
   const handleReturnToCountryInteropUpload = () => {
-    setState("country-interop-no-records");
-    setCurrentProgress(undefined);
+    setState("country-interop-upload");
+    setProgress({
+    current: 0,
+    total: 0,
+    currentTrackingId: ''
+  })
     setSummary(null);
     setErrorMessage("");
   };
@@ -89,22 +84,22 @@ function HomeComponent() {
 
         {state === "country-interop-upload" && (
           <CountryInteropUploadScreen
-            readyRecords={mockReadyRecords}
-            rejectedRecords={[]}
+            readyRecords={records.filter(record => record.status === 'completed')}
+            rejectedRecords={records.filter(record => record.status === 'rejected')}
             onProcessRecords={handleProcessDatabaseRecords}
           />
         )}
 
         {state === "country-interop-processing" && (
           <CountryInteropProcessingScreen
-            currentProgress={currentProgress}
+            currentProgress={progress}
           />
         )}
 
         {state === "country-interop-results" && summary && (
           <CountryInteropResultsScreen
             summary={summary}
-            rejectedRecords={[]}
+            rejectedRecords={records.filter(record => record.status === 'rejected')}
             onReturnToUpload={handleReturnToCountryInteropUpload}
           />
         )}
@@ -112,6 +107,8 @@ function HomeComponent() {
         {state === "country-interop-no-records" && (
           <CountryInteropNoRecordsScreen />
         )}
+
+        {/* TODO: Add error handling screen */}
       </div>
     </MantineProvider>
   );
