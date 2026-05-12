@@ -1,11 +1,10 @@
 import { MessageDescriptor } from 'react-intl'
-import { defineScopes } from '@opencrvs/toolkit/scopes'
+import { defineScopes, EncodedScope } from '@opencrvs/toolkit/scopes'
 
 type Role = {
   id: string
   label: MessageDescriptor
-  // @TODO: After the last v1 scopes (user.create and user.edit) are replaced by v2 scopes, change this to EncodedScope
-  scopes: string[]
+  scopes: EncodedScope[]
 }
 
 export const roles: Role[] = [
@@ -23,6 +22,7 @@ export const roles: Role[] = [
         options: { accessLevel: 'administrativeArea' }
       },
       { type: 'user.read', options: { accessLevel: 'administrativeArea' } },
+      { type: 'user.search', options: { accessLevel: 'administrativeArea' } },
       { type: 'performance.read-dashboards' },
       {
         type: 'workqueue',
@@ -49,35 +49,12 @@ export const roles: Role[] = [
         options: { placeOfEvent: 'administrativeArea' }
       },
       { type: 'record.archive', options: { declaredIn: 'administrativeArea' } },
-      {
-        type: 'record.print-certified-copies',
-        options: { registeredIn: 'administrativeArea' }
-      },
-      {
-        type: 'record.request-correction',
-        options: { registeredIn: 'administrativeArea' }
-      },
-      {
-        type: 'record.custom-action',
-        options: {
-          event: ['birth'],
-          customActionTypes: ['VALIDATE_DECLARATION', 'ESCALATE']
-        }
-      },
-      {
-        type: 'record.custom-action',
-        options: {
-          event: ['birth'],
-          customActionTypes: ['ISSUE_CERTIFIED_COPY', 'ISSUE_VERIFIABLE_CREDENTIAL']
-        }
-      },
-      {
-        type: 'record.custom-action',
-        options: {
-          event: ['death'],
-          customActionTypes: ['VALIDATE_DECLARATION']
-        }
-      },
+      { type: 'record.print-certified-copies', options: { registeredIn: 'administrativeArea' } },
+      { type: 'record.request-correction', options: { registeredIn: 'administrativeArea' } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['VALIDATE_DECLARATION', 'ESCALATE'] } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['REINSTATE_REVOKE_REGISTRATION'], placeOfEvent: 'administrativeArea' } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY', 'ISSUE_VERIFIABLE_CREDENTIAL'] } },
+      { type: 'record.custom-action', options: { event: ['death'], customActionTypes: ['VALIDATE_DECLARATION'] } },
       {
         type: 'dashboard.view',
         options: { ids: ['registrations', 'completeness', 'registry'] }
@@ -99,6 +76,7 @@ export const roles: Role[] = [
         options: { accessLevel: 'administrativeArea' }
       },
       { type: 'user.read', options: { accessLevel: 'administrativeArea' } },
+      { type: 'user.search', options: { accessLevel: 'administrativeArea' } },
       { type: 'performance.read-dashboards' },
       {
         type: 'workqueue',
@@ -125,38 +103,12 @@ export const roles: Role[] = [
         options: { placeOfEvent: 'administrativeArea' }
       },
       { type: 'record.archive', options: { declaredIn: 'administrativeArea' } },
-      {
-        type: 'record.review-duplicates',
-        options: { placeOfEvent: 'administrativeArea' }
-      },
-      {
-        type: 'record.register',
-        options: { placeOfEvent: 'administrativeArea' }
-      },
-      {
-        type: 'record.print-certified-copies',
-        options: { registeredIn: 'administrativeArea' }
-      },
-      {
-        type: 'record.correct',
-        options: { registeredIn: 'administrativeArea' }
-      },
-      {
-        type: 'record.custom-action',
-        options: {
-          event: ['birth'],
-          customActionTypes: ['ESCALATE'],
-          placeOfEvent: 'administrativeArea'
-        }
-      },
-      {
-        type: 'record.custom-action',
-        options: {
-          event: ['birth'],
-          customActionTypes: ['ISSUE_CERTIFIED_COPY', 'ISSUE_VERIFIABLE_CREDENTIAL'],
-          registeredIn: 'administrativeArea'
-        }
-      },
+      { type: 'record.review-duplicates', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.register', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.print-certified-copies', options: { registeredIn: 'administrativeArea' } },
+      { type: 'record.correct', options: { registeredIn: 'administrativeArea' } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ESCALATE, REINSTATE_REVOKE_REGISTRATION'], placeOfEvent: 'administrativeArea' } },
+      { type: 'record.custom-action', options: { event: ['birth'], customActionTypes: ['ISSUE_CERTIFIED_COPY', 'ISSUE_VERIFIABLE_CREDENTIAL'], registeredIn: 'administrativeArea' } },
       { type: 'record.unassign-others' },
       {
         type: 'dashboard.view',
@@ -175,16 +127,12 @@ export const roles: Role[] = [
     },
     scopes: [
       ...defineScopes([
-        {
-          type: 'organisation.read-locations',
-          options: { accessLevel: 'administrativeArea' }
-        },
-        { type: 'user.create', options: { accessLevel: 'administrativeArea' } },
-        { type: 'user.edit', options: { accessLevel: 'administrativeArea' } },
-        { type: 'user.read', options: { accessLevel: 'administrativeArea' } }
-      ]),
-      'user.create[role=HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|PROVINCIAL_REGISTRAR]',
-      'user.edit[role=HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|PROVINCIAL_REGISTRAR]'
+        { type: 'organisation.read-locations', options: { accessLevel: 'administrativeArea' } },
+        { type: 'user.create', options: { accessLevel: 'administrativeArea', role: ['HOSPITAL_CLERK', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'PROVINCIAL_REGISTRAR'] } },
+        { type: 'user.edit', options: { accessLevel: 'administrativeArea', role: ['HOSPITAL_CLERK', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'PROVINCIAL_REGISTRAR'] } },
+        { type: 'user.read', options: { accessLevel: 'administrativeArea' } },
+        { type: 'user.search', options: { accessLevel: 'administrativeArea' } }
+      ])
     ]
   },
   {
@@ -198,9 +146,10 @@ export const roles: Role[] = [
       ...defineScopes([
         { type: 'config.update-all' },
         { type: 'organisation.read-locations' },
-        { type: 'user.create' },
-        { type: 'user.edit' },
+        { type: 'user.create', options: { role: ['HOSPITAL_CLERK', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'NATIONAL_REGISTRAR', 'LOCAL_SYSTEM_ADMIN', 'NATIONAL_SYSTEM_ADMIN', 'PERFORMANCE_MANAGER', 'PROVINCIAL_REGISTRAR', 'EMBASSY_OFFICIAL'] } },
+        { type: 'user.edit', options: { role: ['HOSPITAL_CLERK', 'COMMUNITY_LEADER', 'REGISTRATION_AGENT', 'LOCAL_REGISTRAR', 'NATIONAL_REGISTRAR', 'LOCAL_SYSTEM_ADMIN', 'NATIONAL_SYSTEM_ADMIN', 'PERFORMANCE_MANAGER', 'PROVINCIAL_REGISTRAR', 'EMBASSY_OFFICIAL'] } },
         { type: 'user.read' },
+        { type: 'user.search' },
         { type: 'performance.read' },
         { type: 'record.reindex' },
         { type: 'integration.create' },
@@ -209,9 +158,7 @@ export const roles: Role[] = [
           type: 'dashboard.view',
           options: { ids: ['registrations', 'completeness', 'registry'] }
         }
-      ]),
-      'user.create[role=HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER|PROVINCIAL_REGISTRAR|EMBASSY_OFFICIAL]',
-      'user.edit[role=HOSPITAL_CLERK|COMMUNITY_LEADER|REGISTRATION_AGENT|LOCAL_REGISTRAR|NATIONAL_REGISTRAR|LOCAL_SYSTEM_ADMIN|NATIONAL_SYSTEM_ADMIN|PERFORMANCE_MANAGER|PROVINCIAL_REGISTRAR|EMBASSY_OFFICIAL]'
+      ])
     ]
   },
   {
@@ -224,6 +171,7 @@ export const roles: Role[] = [
     scopes: defineScopes([
       { type: 'performance.read' },
       { type: 'organisation.read-locations' },
+      { type: 'user.search' },
       { type: 'performance.read-dashboards' },
       {
         type: 'dashboard.view',
@@ -243,6 +191,7 @@ export const roles: Role[] = [
       { type: 'performance.read' },
       { type: 'organisation.read-locations' },
       { type: 'user.read' },
+      { type: 'user.search' },
       { type: 'record.search' },
       {
         type: 'workqueue',
@@ -288,6 +237,7 @@ export const roles: Role[] = [
         options: { accessLevel: 'administrativeArea' }
       },
       { type: 'user.read', options: { accessLevel: 'administrativeArea' } },
+      { type: 'user.search', options: { accessLevel: 'administrativeArea' } },
       { type: 'performance.read' },
       { type: 'performance.read-dashboards' },
       { type: 'profile.electronic-signature' },
