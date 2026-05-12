@@ -32,5 +32,10 @@ export const env = cleanEnv(process.env, {
     devDefault:
       'postgres://events_reference_data:reference_data_password@localhost:5432/events',
     desc: 'The database URL for reads and writes to `reference_data.icd10`. See `/infrastructure/postgres/setup-reference-data.sh` for how the default database is set up for your country.'
+  }),
+  SPC_CODING_DATABASE_URL: url({
+    devDefault:
+      'postgres://events_spc_coding:spc_coding_password@localhost:5432/events',
+    desc: 'The database URL for reads and writes to `spc.coding`. See `/infrastructure/postgres/setup-spc-coding.sh` for how the default database is set up for your country.'
   })
 })

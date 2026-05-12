@@ -80,6 +80,10 @@ import { createClient } from '@opencrvs/toolkit/api'
 import { Event } from './events/utils/types'
 import { syncReferenceData } from './data-seeding/reference-data/reference-data'
 import { causeOfDeathSearchHandler } from './data-seeding/reference-data/handler'
+import {
+  insertSpcCodingHandler,
+  spcCodingHandler
+} from './api/spc-coding/handler'
 
 export interface ITokenPayload {
   sub: string
@@ -515,6 +519,29 @@ export async function createServer() {
       auth: false,
       tags: ['api', 'search'],
       description: 'Fuzzy search codes with source-based priority'
+    }
+  })
+
+  /* TODO: add authentication */
+  server.route({
+    method: 'POST',
+    path: '/spc-coding',
+    handler: insertSpcCodingHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'spc-coding'],
+      description: 'Insert SPC coding result'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/spc-coding',
+    handler: spcCodingHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'spc-coding'],
+      description: 'SPC coding results endpoint'
     }
   })
 
