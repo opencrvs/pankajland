@@ -11,7 +11,7 @@
 # and avoid clickjacking http://en.wikipedia.org/wiki/Clickjacking
 # if you need to allow [i]frames, you can use SAMEORIGIN or even set an uri with ALLOW-FROM uri
 # https://developer.mozilla.org/en-US/docs/HTTP/X-Frame-Options
-add_header Content-Security-Policy "frame-ancestors https://*.spc-cod-qa.opencrvs.org" always;
+add_header Content-Security-Policy "frame-ancestors https://*.${DOMAIN}" always;
 
 # Disabled: this app must be embeddable by Core and other trusted subdomains.
 # Use CSP frame-ancestors instead of X-Frame-Options.
