@@ -1,33 +1,42 @@
 import { getClient } from './postgres'
+import { sql } from 'kysely'
 import Hapi from '@hapi/hapi'
 
 type SpcCodingDatabaseRecord = {
   trackingId: string
   status: string
   ucCode: string
-  selectedCodes: string[]
-  multipleCodes: string[]
+  selectedCodes: string
+  multipleCodes: string
   freeText: string
   comments: string
-  processedBySystem: string
+  processedBySystem: string | null
 }
 
-export async function spcCodingHandler(
+type MarkProcessedPayload = {
+  trackingIds: string[]
+}
+
+export async function getPendingSpcCodingHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const db = getClient()
 
   try {
-    const rows = await db.selectFrom('spc.coding').selectAll().execute()
+    const rows = await db
+      .selectFrom('spc.coding')
+      .selectAll()
+      .where('processedBySystem', 'is', null)
+      .execute()
 
     const results: SpcCodingDatabaseRecord[] = rows.map((row) => ({
       trackingId: row.trackingId,
       status: row.status,
       ucCode: row.ucCode,
 
-      selectedCodes: JSON.parse(row.selectedCodes ?? '[]'),
-      multipleCodes: JSON.parse(row.multipleCodes ?? '[]'),
+      selectedCodes: row.selectedCodes,
+      multipleCodes: row.multipleCodes,
 
       freeText: row.freeText,
       comments: row.comments,
@@ -43,7 +52,7 @@ export async function spcCodingHandler(
   }
 }
 
-export async function insertSpcCodingHandler(
+export async function createSpcCodingHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -68,6 +77,47 @@ export async function insertSpcCodingHandler(
       .executeTakeFirst()
 
     return h.response({ result: insertedRow }).code(201)
+  } catch (err) {
+    request.log(['error'], err)
+
+    return h.response({ error: 'Internal server error' }).code(500)
+  }
+}
+
+export async function markSpcCodingProcessedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const db = getClient()
+
+  const payload = request.payload as MarkProcessedPayload
+
+  try {
+    if (
+      !payload.trackingIds ||
+      !Array.isArray(payload.trackingIds) ||
+      payload.trackingIds.length === 0
+    ) {
+      return h
+        .response({ error: 'trackingIds must be a non-empty array' })
+        .code(400)
+    }
+
+    const updatedRows = await db
+      .updateTable('spc.coding')
+      .set({
+        processedBySystem: sql`now()`
+      })
+      .where('trackingId', 'in', payload.trackingIds)
+      .returningAll()
+      .execute()
+
+    return h
+      .response({
+        updatedCount: updatedRows.length,
+        results: updatedRows
+      })
+      .code(200)
   } catch (err) {
     request.log(['error'], err)
 

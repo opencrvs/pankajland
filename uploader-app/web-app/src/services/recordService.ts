@@ -1,9 +1,6 @@
 import { GATEWAY_HOST, COUNTRY_CONFIG_HOST } from '../util/constants'
 import { createClient } from '@opencrvs/toolkit/api'
-import { v4 as uuidv4 } from 'uuid'
-import { getDecodedToken } from './token'
 import { UserInfo, RecordsToEmail, SpcCodingDatabaseRecord } from '../util/types'
-// import fetch from 'node-fetch'
 
 export interface DeathRecord {
   id: string
@@ -43,11 +40,11 @@ export interface SearchResult {
 }
 
 /**
- * Find a death record by CertificateKey using the OpenCRVS search API
+ * Find a death record by TrackingId using the OpenCRVS search API
  */
-export async function findRecordByCertificateKey(
+export async function findRecordByTrackingId(
   token: string,
-  certificateKey: string
+  trackingId: string
 ): Promise<DeathRecord | null> {
   const url = new URL('events', GATEWAY_HOST).toString()
   const client = createClient(url, `Bearer ${token}`)
@@ -57,15 +54,10 @@ export async function findRecordByCertificateKey(
       query: {
         type: 'and',
         clauses: [
-          { eventType: 'death' },
-          {
-            data: {
-              'deceased.certificateKey': {
-                type: 'exact',
-                term: certificateKey
-              }
-            }
-          }
+          {trackingId: {
+            term: trackingId,
+            type: 'exact'
+          } }
         ]
       },
       limit: 1,
@@ -77,7 +69,7 @@ export async function findRecordByCertificateKey(
 
     if (results.length === 0) {
       console.log(
-        '[DEBUG] findRecordByCertificateKey - Not processed as certificateKey was absent'
+        '[DEBUG] findRecordByTrackingId - Not processed as trackingId was absent'
       )
       return null
     }
@@ -90,158 +82,13 @@ export async function findRecordByCertificateKey(
   }
 }
 
-/**
- * Update a death record with IRIS output fields using the OpenCRVS API
- * Updates: irisOutput.ucCode, irisOutput.selectedCodes, irisOutput.multipleCodes, irisOutput.comment
- */
-export async function updateRecordWithCauseOfDeath(
-  token: string,
-  record: DeathRecord,
-  row: any
-): Promise<boolean> {
-  const eventId = record.id
-  const eventDeclaration = record.declaration
-  const markedAsRejectedInOcrvs = record.flags?.includes('rejected')
-  const url = new URL('events', GATEWAY_HOST).toString()
-  const client = createClient(url, `Bearer ${token}`)
-
-  const decodedToken = getDecodedToken(token)
-
-  try {
-    // Step 1: Use the assignment action to update the record with IRIS output fields
-    const assignmentResult =
-      await client.event.actions.assignment.assign.mutate({
-        type: 'ASSIGN',
-        eventId,
-        transactionId: uuidv4(),
-        assignedTo: decodedToken?.sub || 'unknown-user',
-        annotation: {}
-      })
-
-    console.log(
-      '[DEBUG] updateRecordWithCauseOfDeath - Assignment result:',
-      assignmentResult
-    )
-
-    // Merge the IRIS output fields with the event declaration
-    const updatedDeclaration = {
-      ...eventDeclaration,
-      'irisOutput.ucCode':
-        row.UCCode || eventDeclaration?.['irisOutput.ucCode'] || '',
-      'irisOutput.selectedCodes':
-        row.SelectedCodes ||
-        eventDeclaration?.['irisOutput.selectedCodes'] ||
-        '',
-      'irisOutput.multipleCodes':
-        row.MultipleCodes ||
-        eventDeclaration?.['irisOutput.multipleCodes'] ||
-        '',
-      'irisOutput.freeText':
-        row.FreeText || eventDeclaration?.['irisOutput.freeText'] || ''
-    }
-
-    if (row.Status === 'Final' && markedAsRejectedInOcrvs) {
-      // If the IRIS status has changed to "Final"
-      // and the record has a [rejected] flag,
-      // we should attempt to reprocess it
-
-      // An event in 'DECLARED' state with [rejected] flag
-      // can only accept the following actions
-      // READ, NOTIFY, CUSTOM, EDIT, ARCHIVE.
-
-      // Request EDIT action to remove the "rejected" flag
-      const editResult = await client.event.actions.edit.request.mutate({
-        transactionId: uuidv4(),
-        declaration: updatedDeclaration,
-        eventId,
-        content: { reason: row.FreeText || '' },
-        keepAssignment: true
-      })
-
-      // Request REGISTER action
-      const registerResult = await client.event.actions.register.request.mutate(
-        {
-          declaration: updatedDeclaration,
-          annotation: {
-            status: row.Status || '',
-            reason: row.FreeText || '',
-            'review.comments': row.Comments || ''
-          },
-          eventId,
-          transactionId: uuidv4()
-        }
-      )
-    } else if (row.Status === 'Final') {
-      // Request REGISTER action
-      const registerResult = await client.event.actions.register.request.mutate(
-        {
-          declaration: updatedDeclaration,
-          annotation: {
-            status: row.Status || '',
-            reason: row.FreeText || '',
-            'review.comments': row.Comments || ''
-          },
-          eventId,
-          transactionId: uuidv4()
-        }
-      )
-    } else {
-      // Request REJECT action if the IRIS status is "Rejected"
-      const rejectResult = await client.event.actions.reject.request.mutate({
-        transactionId: uuidv4(),
-        declaration: updatedDeclaration,
-        annotation: {
-          status: row.Status || '',
-          reason: row.FreeText || '',
-          'review.comments': row.Comments || ''
-        },
-        eventId,
-        content: { reason: row.FreeText || '' }
-      })
-    }
-
-    return true
-  } catch (error) {
-    throw error
-  }
-}
-
-/**
- * Fetch user details by user ID from OpenCRVS
- */
-export async function getUserById(
-  token: string,
-  userId: string
-): Promise<UserInfo | null> {
-  const url = new URL('events', GATEWAY_HOST).toString()
-  const client = createClient(url, `Bearer ${token}`)
-
-  try {
-    const userOrSystem = await client.user.get.query(userId)
-
-    console.log('userOrSystem :>> ', userOrSystem)
-
-    if (userOrSystem.type === 'user') {
-      return {
-        id: userOrSystem.id || userId,
-        email: userOrSystem.email || '',
-        firstName: userOrSystem.name?.[0]?.given?.[0] || '',
-        lastName: userOrSystem.name?.[0]?.family || ''
-      }
-    }
-    return null
-  } catch (error) {
-    return null
-  }
-}
-
 type SpcCodingApiResponse = {
   results: SpcCodingDatabaseRecord[]
 }
 /**
  * Fetch SPC Coded records from spc.coding table
  */
-export async function getSPCCodedRecords(): Promise<SpcCodingDatabaseRecord[] | []> {
+export async function getPendingSPCRecords(): Promise<SpcCodingDatabaseRecord[] | []> {
   try {
     const response = await fetch(
       new URL('spc-coding', COUNTRY_CONFIG_HOST)
@@ -256,6 +103,32 @@ export async function getSPCCodedRecords(): Promise<SpcCodingDatabaseRecord[] | 
     return data.results
   } catch {
     return []
+  }
+}
+
+/**
+ * Mark SPC coded records as processed
+ */
+export async function markSPCCodedRecordsAsProcessed(
+  trackingIds: string[]
+): Promise<boolean> {
+  try {
+    const response = await fetch(
+      new URL('spc-coding/processed', COUNTRY_CONFIG_HOST),
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          trackingIds
+        })
+      }
+    )
+
+    return response.ok
+  } catch {
+    return false
   }
 }
 

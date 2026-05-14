@@ -7,10 +7,9 @@ import { ProcessingSummary, SpcCodingDatabaseRecord  } from '../util/types'
 import { processRecords } from '../util/recordProccessor'
 import { CountryInteropProcessingScreen } from '../components/pages/CountryInteropProcessingScreen'
 import { CountryInteropResultsScreen } from '../components/pages/CountryInteropResultsScreen'
-import { getSPCCodedRecords } from '../services/recordService'
-import { CountryInteropNoRecordsScreen } from '../components/pages/CountryInteropNoRecordsScreen'
+import { getPendingSPCRecords } from '../services/recordService'
 
-type AppState =  "country-interop-upload" | "country-interop-no-records" | "country-interop-processing" | "country-interop-results" | "error";
+type AppState =  "country-interop-upload" | "country-interop-processing" | "country-interop-results" | "error";
 
 export const Route = createFileRoute('/')({
   component: HomeComponent
@@ -30,25 +29,23 @@ function HomeComponent() {
  const [records, setRecords] = useState<SpcCodingDatabaseRecord[] | []>([]);
 
 useEffect(() => {
+  if (state !== "country-interop-upload") {
+    return;
+  }
   async function loadRecords() {
-    const records = await getSPCCodedRecords()
+    const records = await getPendingSPCRecords()
     setRecords(records)
   }
   loadRecords()
-}, [])
+}, [state])
 
-  const handleProcessDatabaseRecords = async (readyRecords: SpcCodingDatabaseRecord[], rejectedRecords: SpcCodingDatabaseRecord[]) => {
+  const handleProcessDatabaseRecords = async (records: SpcCodingDatabaseRecord[]) => {
     try {
       setState("country-interop-processing");
       setErrorMessage("");
 
-      if (readyRecords.length === 0) {
-        setState("country-interop-processing");
-      }
-
-      // Process the records
       const result = await processRecords(
-        readyRecords,
+        records,
         (current, total, currentTrackingId) => {
           setProgress({ current, total, currentTrackingId });
         },
@@ -84,8 +81,7 @@ useEffect(() => {
 
         {state === "country-interop-upload" && (
           <CountryInteropUploadScreen
-            readyRecords={records.filter(record => record.status === 'completed')}
-            rejectedRecords={records.filter(record => record.status === 'rejected')}
+            records={records}
             onProcessRecords={handleProcessDatabaseRecords}
           />
         )}
@@ -102,10 +98,6 @@ useEffect(() => {
             rejectedRecords={records.filter(record => record.status === 'rejected')}
             onReturnToUpload={handleReturnToCountryInteropUpload}
           />
-        )}
-
-        {state === "country-interop-no-records" && (
-          <CountryInteropNoRecordsScreen />
         )}
 
         {/* TODO: Add error handling screen */}

@@ -1,35 +1,45 @@
-import { Button, Alert, ScrollArea, Text } from '@mantine/core';
-import { AlertCircle, Copy, CheckCircle, Database } from 'lucide-react';
-import { useState } from 'react';
-import { DatabaseRecord, RejectedRecord, SpcCodingDatabaseRecord } from '../../util/types';
-
-
+import { Button, Alert, ScrollArea, Text } from '@mantine/core'
+import { AlertCircle, Copy, CheckCircle, Database } from 'lucide-react'
+import { useState } from 'react'
+import {
+  DatabaseRecord,
+  RejectedRecord,
+  SpcCodingDatabaseRecord
+} from '../../util/types'
+import { CountryInteropNoRecordsScreen } from './CountryInteropNoRecordsScreen'
 
 interface CountryInteropUploadScreenProps {
-  readyRecords: SpcCodingDatabaseRecord[] | [];
-  rejectedRecords: SpcCodingDatabaseRecord[] | [];
-  onProcessRecords: (readyRecords: SpcCodingDatabaseRecord[] | [], rejectedRecords: SpcCodingDatabaseRecord[] | []) => void;
+  records: SpcCodingDatabaseRecord[] | []
+  onProcessRecords: (records: SpcCodingDatabaseRecord[] | []) => void
 }
 
 export function CountryInteropUploadScreen({
-  readyRecords,
-  rejectedRecords,
-  onProcessRecords,
+  records,
+  onProcessRecords
 }: CountryInteropUploadScreenProps) {
-  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false)
+
+  const readyRecords = records.filter((record) => record.status === 'completed')
+  const rejectedRecords = records.filter(
+    (record) => record.status === 'rejected'
+  )
 
   const handleCopyRejectedList = () => {
     const text = rejectedRecords
-      .map((record) => `${record.trackingId}: ${record.comments}`)
-      .join('\n');
-    navigator.clipboard.writeText(text);
-    setCopiedToClipboard(true);
-    setTimeout(() => setCopiedToClipboard(false), 2000);
-  };
+      .map((record) => `${record.trackingId}: ${record.freeText}`)
+      .join('\n')
+    navigator.clipboard.writeText(text)
+    setCopiedToClipboard(true)
+    setTimeout(() => setCopiedToClipboard(false), 2000)
+  }
 
   const handleProcessRecords = () => {
-    onProcessRecords(readyRecords, rejectedRecords);
-  };
+    onProcessRecords(records)
+  }
+
+  if (records.length === 0) {
+    return <CountryInteropNoRecordsScreen />
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
@@ -45,24 +55,29 @@ export function CountryInteropUploadScreen({
         <div className="mb-6 flex justify-center">
           <Button
             onClick={handleProcessRecords}
-            disabled={readyRecords?.length === 0 && rejectedRecords.length === 0}
+            disabled={records?.length === 0}
             size="lg"
             className="bg-green-700 hover:bg-green-800 text-white disabled:bg-gray-400"
           >
-            Process {readyRecords?.length || 0 + rejectedRecords.length} Record{(readyRecords?.length || 0 + rejectedRecords.length) !== 1 ? 's' : ''}
+            Process {records?.length} Record{records?.length !== 1 ? 's' : ''}
           </Button>
         </div>
 
         {/* Ready Records Card */}
         <div className="mb-6 p-6 bg-green-50 border-2 border-green-300 rounded-lg">
           <div className="flex items-start gap-4">
-            <Database className="text-green-700 mt-1" size={32} strokeWidth={1.5} />
+            <Database
+              className="text-green-700 mt-1"
+              size={32}
+              strokeWidth={1.5}
+            />
             <div className="flex-1">
               <h2 className="text-xl text-green-900 mb-2">
-                {readyRecords?.length} record{readyRecords?.length !== 1 ? 's' : ''} ready to import
+                {readyRecords?.length} record
+                {readyRecords?.length !== 1 ? 's' : ''} ready to import
               </h2>
               <p className="text-green-800">
-                {readyRecords &&readyRecords.length > 0
+                {readyRecords && readyRecords.length > 0
                   ? `${readyRecords?.length} record${readyRecords?.length !== 1 ? 's have' : ' has'} been encoded by the SPC Mortality Group and ${readyRecords?.length !== 1 ? 'are' : 'is'} ready to be imported and added to existing registrations as corrections.`
                   : 'No records are currently available for import.'}
               </p>
@@ -75,31 +90,47 @@ export function CountryInteropUploadScreen({
           <div className="p-6 bg-red-50 border-2 border-red-300 rounded-lg">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-start gap-3">
-                <AlertCircle className="text-red-700 mt-1" size={24} strokeWidth={1.5} />
+                <AlertCircle
+                  className="text-red-700 mt-1"
+                  size={24}
+                  strokeWidth={1.5}
+                />
                 <div>
                   <h2 className="text-xl text-red-900 mb-1">
-                    {rejectedRecords.length} Rejected Record{rejectedRecords.length !== 1 ? 's' : ''}
+                    {rejectedRecords.length} Rejected Record
+                    {rejectedRecords.length !== 1 ? 's' : ''}
                   </h2>
                   <p className="text-sm text-red-700">
-                    These records were rejected by the coding group. The reason for rejection will be entered as a comment on each record as a correction.
+                    These records were rejected by the coding group. The reason
+                    for rejection will be entered as a comment on each record as
+                    a correction.
                   </p>
                 </div>
               </div>
               <Button
                 onClick={handleCopyRejectedList}
                 variant="outline"
-                leftSection={copiedToClipboard ? <CheckCircle size={16} /> : <Copy size={16} />}
+                leftSection={
+                  copiedToClipboard ? (
+                    <CheckCircle size={16} />
+                  ) : (
+                    <Copy size={16} />
+                  )
+                }
                 className={
                   copiedToClipboard
-                    ? 'border-green-600 text-green-700 hover:bg-green-50'
-                    : 'border-red-600 text-red-700 hover:bg-red-50'
+                    ? 'min-w-[120px] border-green-600 text-green-700 hover:bg-green-50'
+                    : 'min-w-[120px] border-red-600 text-red-700 hover:bg-red-50'
                 }
               >
                 {copiedToClipboard ? 'Copied!' : 'Copy List'}
               </Button>
             </div>
 
-            <ScrollArea h={300} className="bg-white rounded border border-red-200 p-4">
+            <ScrollArea
+              h={300}
+              className="bg-white rounded border border-red-200 p-4"
+            >
               <div className="space-y-3">
                 {rejectedRecords.map((record, index) => (
                   <div
@@ -110,7 +141,9 @@ export function CountryInteropUploadScreen({
                       <span className="font-mono text-sm text-red-900 font-semibold min-w-[120px]">
                         {record.trackingId}
                       </span>
-                      <span className="text-sm text-red-800">{record.comments}</span>
+                      <span className="text-sm text-red-800">
+                        {record.freeText}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -131,5 +164,5 @@ export function CountryInteropUploadScreen({
         )}
       </div>
     </div>
-  );
+  )
 }

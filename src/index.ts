@@ -81,8 +81,9 @@ import { Event } from './events/utils/types'
 import { syncReferenceData } from './data-seeding/reference-data/reference-data'
 import { causeOfDeathSearchHandler } from './data-seeding/reference-data/handler'
 import {
-  insertSpcCodingHandler,
-  spcCodingHandler
+  createSpcCodingHandler,
+  markSpcCodingProcessedHandler,
+  getPendingSpcCodingHandler
 } from './api/spc-coding/handler'
 
 export interface ITokenPayload {
@@ -526,7 +527,7 @@ export async function createServer() {
   server.route({
     method: 'POST',
     path: '/spc-coding',
-    handler: insertSpcCodingHandler,
+    handler: createSpcCodingHandler,
     options: {
       auth: false,
       tags: ['api', 'spc-coding'],
@@ -537,11 +538,22 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/spc-coding',
-    handler: spcCodingHandler,
+    handler: getPendingSpcCodingHandler,
     options: {
       auth: false,
       tags: ['api', 'spc-coding'],
       description: 'SPC coding results endpoint'
+    }
+  })
+
+  server.route({
+    method: 'PATCH',
+    path: '/spc-coding/processed',
+    handler: markSpcCodingProcessedHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'spc-coding'],
+      description: 'Mark SPC coding rows as processed'
     }
   })
 

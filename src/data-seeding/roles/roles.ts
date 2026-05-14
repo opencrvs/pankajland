@@ -102,6 +102,10 @@ export const roles: Role[] = [
         type: 'record.reject',
         options: { placeOfEvent: 'administrativeArea' }
       },
+      {
+        type: 'record.request-correction',
+        options: { placeOfEvent: 'administrativeArea' }
+      },
       { type: 'record.archive', options: { declaredIn: 'administrativeArea' } },
       { type: 'record.review-duplicates', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.register', options: { placeOfEvent: 'administrativeArea' } },
