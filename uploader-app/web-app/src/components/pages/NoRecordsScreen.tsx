@@ -1,7 +1,7 @@
 import { Alert, Text } from '@mantine/core';
 import { Database, CheckCircle } from 'lucide-react';
 
-export function CountryInteropNoRecordsScreen() {
+export function NoRecordsScreen() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
       <div className="w-full max-w-2xl">

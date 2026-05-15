@@ -2,11 +2,11 @@ import { MantineProvider } from '@mantine/core'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import '../styles/mantine.css'
-import { CountryInteropUploadScreen } from '../components/pages/CountryInteropUploadScreen'
+import { ImportScreen } from '../components/pages/ImportScreen'
 import { ProcessingSummary, SpcCodingDatabaseRecord  } from '../util/types'
 import { processRecords } from '../util/recordProccessor'
-import { CountryInteropProcessingScreen } from '../components/pages/CountryInteropProcessingScreen'
-import { CountryInteropResultsScreen } from '../components/pages/CountryInteropResultsScreen'
+import { ProcessingScreen } from '../components/pages/ProcessingScreen'
+import { ResultsScreen } from '../components/pages/ResultsScreen'
 import { getPendingSPCRecords } from '../services/recordService'
 
 type AppState =  "country-interop-upload" | "country-interop-processing" | "country-interop-results" | "error";
@@ -80,20 +80,20 @@ useEffect(() => {
       <div className="max-h-full bg-white">
 
         {state === "country-interop-upload" && (
-          <CountryInteropUploadScreen
+          <ImportScreen
             records={records}
             onProcessRecords={handleProcessDatabaseRecords}
           />
         )}
 
         {state === "country-interop-processing" && (
-          <CountryInteropProcessingScreen
+          <ProcessingScreen
             currentProgress={progress}
           />
         )}
 
         {state === "country-interop-results" && summary && (
-          <CountryInteropResultsScreen
+          <ResultsScreen
             summary={summary}
             rejectedRecords={records.filter(record => record.status === 'rejected')}
             onReturnToUpload={handleReturnToCountryInteropUpload}

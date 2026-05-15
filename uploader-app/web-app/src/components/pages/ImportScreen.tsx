@@ -4,17 +4,17 @@ import { useState } from 'react'
 import {
   SpcCodingDatabaseRecord
 } from '../../util/types'
-import { CountryInteropNoRecordsScreen } from './CountryInteropNoRecordsScreen'
+import { NoRecordsScreen } from './NoRecordsScreen'
 
-interface CountryInteropUploadScreenProps {
+interface ImportScreenProps {
   records: SpcCodingDatabaseRecord[] | []
   onProcessRecords: (records: SpcCodingDatabaseRecord[] | []) => void
 }
 
-export function CountryInteropUploadScreen({
+export function ImportScreen({
   records,
   onProcessRecords
-}: CountryInteropUploadScreenProps) {
+}: ImportScreenProps) {
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
 
   const readyRecords = records.filter((record) => record.status === 'completed')
@@ -36,7 +36,7 @@ export function CountryInteropUploadScreen({
   }
 
   if (records.length === 0) {
-    return <CountryInteropNoRecordsScreen />
+    return <NoRecordsScreen />
   }
 
   return (

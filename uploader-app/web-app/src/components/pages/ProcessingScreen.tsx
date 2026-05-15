@@ -2,11 +2,7 @@ import { Text } from '@mantine/core';
 import { Loader2, Database, CheckCircle2, AlertCircle } from 'lucide-react';
 import { ProcessingProgress } from '../../util/types';
 
-interface CountryInteropProcessingScreenProps {
-  currentProgress?: ProcessingProgress;
-}
-
-export function CountryInteropProcessingScreen({ currentProgress }: { currentProgress: ProcessingProgress }) {
+export function ProcessingScreen({ currentProgress }: { currentProgress: ProcessingProgress }) {
   console.log('progress :>> ', currentProgress);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">

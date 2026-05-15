@@ -20,17 +20,17 @@ import {
 import { ProcessingSummary, SpcCodingDatabaseRecord } from '../../util/types'
 import { useState } from 'react'
 
-interface CountryInteropResultsScreenProps {
+interface ResultsScreenProps {
   summary: ProcessingSummary
   rejectedRecords: SpcCodingDatabaseRecord[]
   onReturnToUpload: () => void
 }
 
-export function CountryInteropResultsScreen({
+export function ResultsScreen({
   summary,
   rejectedRecords,
   onReturnToUpload
-}: CountryInteropResultsScreenProps) {
+}: ResultsScreenProps) {
   const hasSkipped = summary.skipped > 0
   const hasErrors = summary.errors > 0
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
