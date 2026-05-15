@@ -129,7 +129,7 @@ export function ResultsScreen({
             mb="md"
           >
             {summary.successful} record(s) were successfully corrected with
-            cause of death codes.
+            either cause of death codes or rejected reasons.
           </Alert>
         )}
 

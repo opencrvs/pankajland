@@ -9,14 +9,14 @@ import { ProcessingScreen } from '../components/pages/ProcessingScreen'
 import { ResultsScreen } from '../components/pages/ResultsScreen'
 import { getPendingSPCRecords } from '../services/recordService'
 
-type AppState =  "country-interop-upload" | "country-interop-processing" | "country-interop-results" | "error";
+type AppState =  "import" | "processing" | "results" | "error";
 
 export const Route = createFileRoute('/')({
   component: HomeComponent
 })
 
 function HomeComponent() {
-  const [state, setState] = useState<AppState>("country-interop-upload");
+  const [state, setState] = useState<AppState>("import");
   const [progress, setProgress] = useState({
     current: 0,
     total: 0,
@@ -29,7 +29,7 @@ function HomeComponent() {
  const [records, setRecords] = useState<SpcCodingDatabaseRecord[] | []>([]);
 
 useEffect(() => {
-  if (state !== "country-interop-upload") {
+  if (state !== "import") {
     return;
   }
   async function loadRecords() {
@@ -41,7 +41,7 @@ useEffect(() => {
 
   const handleProcessDatabaseRecords = async (records: SpcCodingDatabaseRecord[]) => {
     try {
-      setState("country-interop-processing");
+      setState("processing");
       setErrorMessage("");
 
       const result = await processRecords(
@@ -52,7 +52,7 @@ useEffect(() => {
       );
 
       setSummary(result);
-      setState("country-interop-results");
+      setState("results");
     } catch (error) {
       const errorMsg =
         error instanceof Error
@@ -65,7 +65,7 @@ useEffect(() => {
   };
 
   const handleReturnToCountryInteropUpload = () => {
-    setState("country-interop-upload");
+    setState("import");
     setProgress({
     current: 0,
     total: 0,
@@ -79,20 +79,20 @@ useEffect(() => {
     <MantineProvider>
       <div className="max-h-full bg-white">
 
-        {state === "country-interop-upload" && (
+        {state === "import" && (
           <ImportScreen
             records={records}
             onProcessRecords={handleProcessDatabaseRecords}
           />
         )}
 
-        {state === "country-interop-processing" && (
+        {state === "processing" && (
           <ProcessingScreen
             currentProgress={progress}
           />
         )}
 
-        {state === "country-interop-results" && summary && (
+        {state === "results" && summary && (
           <ResultsScreen
             summary={summary}
             rejectedRecords={records.filter(record => record.status === 'rejected')}

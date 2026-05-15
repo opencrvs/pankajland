@@ -1,4 +1,4 @@
-import { Button, Alert, ScrollArea, Text } from '@mantine/core'
+import { Button, Alert, ScrollArea } from '@mantine/core'
 import { AlertCircle, Copy, CheckCircle, Database } from 'lucide-react'
 import { useState } from 'react'
 import {
