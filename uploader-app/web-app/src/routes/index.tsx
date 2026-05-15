@@ -27,6 +27,11 @@ function HomeComponent() {
 
  const [records, setRecords] = useState<SpcCodingDatabaseRecord[] | []>([]);
 
+ const token = localStorage.getItem('authToken')
+  if (!token) {
+    throw new Error('Authentication token not found. Please log in.')
+  }
+
 useEffect(() => {
   if (state !== "import") {
     return;
@@ -45,6 +50,7 @@ useEffect(() => {
 
       const result = await processRecords(
         records,
+        token,
         (current, total, currentTrackingId) => {
           setProgress({ current, total, currentTrackingId });
         },

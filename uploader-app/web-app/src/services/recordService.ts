@@ -1,7 +1,7 @@
 import { GATEWAY_HOST, COUNTRY_CONFIG_HOST } from '../util/constants'
 import { createClient } from '@opencrvs/toolkit/api'
 import { UserInfo, RecordsToEmail, SpcCodingDatabaseRecord, ProcessingResult, ProcessingSummary } from '../util/types'
-import { ActionStatus } from '@opencrvs/toolkit/events'
+import { ActionBase, ActionStatus } from '@opencrvs/toolkit/events'
 import { getDecodedToken } from './token'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -210,18 +210,13 @@ export async function sendProcessingNotificationEmail(
 }
 
 const correctRecord = async (
-  trackingId: string,
-  row: SpcCodingDatabaseRecord
+  row: SpcCodingDatabaseRecord,
+  token: string
 ): Promise<boolean> => {
   const url = new URL('events', GATEWAY_HOST).toString()
-  const token = localStorage.getItem('authToken')
-  if (!token) {
-    throw new Error('Authentication token not found. Please log in.')
-  }
-
   const decodedToken = getDecodedToken(token)
   const client = createClient(url, `Bearer ${token}`)
-  const record = await findRecordByTrackingId(token, trackingId)
+  const record = await findRecordByTrackingId(token, row.trackingId)
   if (!record) {
     throw new Error('Record not found.')
   }
@@ -271,7 +266,7 @@ const correctRecord = async (
     })
 
   const requestId = correctionResult.actions.find(
-    (a) =>
+    (a: ActionBase) =>
       a.transactionId === transactionId && a.status === ActionStatus.Accepted
   )?.id
 
@@ -295,7 +290,8 @@ const correctRecord = async (
 
 export const processRecord = async (
   row: SpcCodingDatabaseRecord,
-  rowIndex: number
+  rowIndex: number,
+  token: string
 ): Promise<ProcessingResult> => {
   const trackingId = row.trackingId.trim()
 
@@ -322,7 +318,7 @@ export const processRecord = async (
     }
 
     // Correct the record with the cause of death codes
-    const updated = await correctRecord(trackingId, row)
+    const updated = await correctRecord(row, token)
 
     if (!updated) {
       return {
@@ -360,6 +356,7 @@ export const processRecord = async (
 
 export const processRecords = async (
   rows: SpcCodingDatabaseRecord[],
+  token: string,
   onProgress?: (
     current: number,
     total: number,
@@ -372,7 +369,7 @@ export const processRecords = async (
     if (onProgress) {
       onProgress(i + 1, rows.length, rows[i].trackingId?.trim() || '')
     }
-    const result = await processRecord(rows[i], i + 1)
+    const result = await processRecord(rows[i], i + 1, token)
     results.push(result)
   }
 
