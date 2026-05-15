@@ -44,14 +44,6 @@ export interface ProcessingProgress {
   currentTrackingId: string;
 }
 
-export interface DatabaseRecord {
-  trackingId: string;
-  certificateKey: string;
-  ucCode?: string;
-  selectedCodes?: string;
-  multipleCodes?: string;
-}
-
 export interface SpcCodingDatabaseRecord {
   trackingId: string
   status: string
@@ -61,17 +53,4 @@ export interface SpcCodingDatabaseRecord {
   freeText: string
   comments: string
   processedBySystem: string
-}
-
-export interface RejectedRecord {
-  trackingId: string;
-  certificateKey: string;
-  reason: string;
-}
-
-export interface DeathRecord {
-  id: string;
-  deceased: string;
-  causeOfDeath: string[];
-  dateOfDeath: string;
 }

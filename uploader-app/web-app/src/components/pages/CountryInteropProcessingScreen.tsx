@@ -1,6 +1,5 @@
 import { Text } from '@mantine/core';
 import { Loader2, Database, CheckCircle2, AlertCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { ProcessingProgress } from '../../util/types';
 
 interface CountryInteropProcessingScreenProps {

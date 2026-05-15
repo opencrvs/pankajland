@@ -2,8 +2,6 @@ import { Button, Alert, ScrollArea, Text } from '@mantine/core'
 import { AlertCircle, Copy, CheckCircle, Database } from 'lucide-react'
 import { useState } from 'react'
 import {
-  DatabaseRecord,
-  RejectedRecord,
   SpcCodingDatabaseRecord
 } from '../../util/types'
 import { CountryInteropNoRecordsScreen } from './CountryInteropNoRecordsScreen'

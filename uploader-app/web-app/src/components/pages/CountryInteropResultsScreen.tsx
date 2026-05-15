@@ -18,7 +18,6 @@ import {
   AlertTriangle
 } from 'lucide-react'
 import { ProcessingSummary, SpcCodingDatabaseRecord } from '../../util/types'
-import { RejectedRecord } from '../../util/types'
 import { useState } from 'react'
 
 interface CountryInteropResultsScreenProps {

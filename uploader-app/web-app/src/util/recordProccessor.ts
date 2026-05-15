@@ -104,10 +104,7 @@ export const processRecord = async (
   const trackingId = row.trackingId.trim()
 
   try {
-    // Extract cause of death code from rows with status "completed"
     const causesOfDeath = row.ucCode
-
-    // Extract freeText from rows with status "rejected"
     const irisRejectionReason = row.freeText
 
     if (row.status === 'completed' && !causesOfDeath) {
