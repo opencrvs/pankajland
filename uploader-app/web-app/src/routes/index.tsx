@@ -4,10 +4,9 @@ import { useEffect, useState } from 'react'
 import '../styles/mantine.css'
 import { ImportScreen } from '../components/pages/ImportScreen'
 import { ProcessingSummary, SpcCodingDatabaseRecord  } from '../util/types'
-import { processRecords } from '../util/recordProccessor'
 import { ProcessingScreen } from '../components/pages/ProcessingScreen'
 import { ResultsScreen } from '../components/pages/ResultsScreen'
-import { getPendingSPCRecords } from '../services/recordService'
+import { getPendingSPCRecords, processRecords } from '../services/recordService'
 
 type AppState =  "import" | "processing" | "results" | "error";
 
