@@ -11,16 +11,6 @@ on:
       - '*'
   workflow_dispatch:
     inputs:
-      environment:
-        type: choice
-        description: Environment to reset
-        required: true
-        default: 'development'
-        options:
-          - development
-          - staging
-          - qa
-          - production
       branch_name:
         description: Branch to build from
         default: develop
@@ -44,7 +34,6 @@ jobs:
       version: ${{ steps.country_config.outputs.version }}
       version_common: ${{ steps.country_config.outputs.version_common }}
     runs-on: ${{ matrix.runner }}
-    environment: ${{ inputs.environment || 'qa'}}
     steps:
       - uses: actions/checkout@v5
         if: github.event_name == 'workflow_dispatch'
@@ -98,17 +87,13 @@ jobs:
           file: ./Dockerfile.assets
           tags: |
             ${{ secrets.DOCKERHUB_ACCOUNT}}/${{ secrets.DOCKERHUB_REPO }}:${{ steps.country_config.outputs.version }}-assets
-      
+
       - name: Build and push uploader app
         uses: docker/build-push-action@v6
         with:
           push: true
           context: ./uploader-app
           file: ./uploader-app/web-app/Dockerfile
-          build-args: |
-            VITE_EXTERNAL_CLIENT_URL=https://register.${{ vars.DOMAIN }}
-            VITE_GATEWAY_URL=https://gateway.${{ vars.DOMAIN }}
-            VITE_COUNTRY_CONFIG_URL=https://countryconfig.${{ vars.DOMAIN }}
           tags: |
             ${{ secrets.DOCKERHUB_ACCOUNT}}/${{ secrets.DOCKERHUB_REPO }}-uploader:${{ steps.country_config.outputs.version }}
 
@@ -143,9 +128,13 @@ jobs:
           if [[ "$BUILD_ARM" == "true" ]]; then
             MANIFEST_LIST="$REPO:$TAG-amd64 $REPO:$TAG-arm64"
             ASSETS_MANIFEST_LIST="$REPO:$TAG-amd64-assets $REPO:$TAG-arm64-assets"
+            UPLOADER_API_MANIFEST_LIST="${REPO}-uploader-api:$TAG-amd64 ${REPO}-uploader-api:$TAG-arm64"
+            UPLOADER_WEB_MANIFEST_LIST="${REPO}-uploader:$TAG-amd64 ${REPO}-uploader:$TAG-arm64"
           else
             MANIFEST_LIST="$REPO:$TAG-amd64"
             ASSETS_MANIFEST_LIST="$REPO:$TAG-amd64-assets"
+            UPLOADER_API_MANIFEST_LIST="${REPO}-uploader-api:$TAG-amd64"
+            UPLOADER_WEB_MANIFEST_LIST="${REPO}-uploader:$TAG-amd64"
           fi
 
           echo "[🔁 pushing ] $REPO:$TAG"
@@ -156,3 +145,11 @@ jobs:
           docker manifest create $REPO:$TAG-assets \
              $ASSETS_MANIFEST_LIST
           docker manifest push $REPO:$TAG-assets
+          echo "[🔁 pushing ] ${REPO}-uploader:$TAG"
+          docker manifest create ${REPO}-uploader:$TAG \
+             $UPLOADER_WEB_MANIFEST_LIST
+          docker manifest push ${REPO}-uploader:$TAG
+          echo "[🔁 pushing ] ${REPO}-uploader-api:$TAG"
+          docker manifest create ${REPO}-uploader-api:$TAG \
+             $UPLOADER_API_MANIFEST_LIST
+          docker manifest push ${REPO}-uploader-api:$TAG
