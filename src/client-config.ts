@@ -43,7 +43,19 @@ export default defineClientConfig({
         description: 'Menu item for registry dashboard'
       },
       url: 'http://localhost:4444/public/dashboard/dc66b77a-79df-4f68-8fc8-5e5d5a2d7a35#bordered=false&titled=false&refresh=300'
-    }
+    },
+    {
+      id: 'uploader',
+      title: {
+        id: 'dashboard.uploaderTitle',
+        defaultMessage: 'Process SPC encoded records',
+        description: 'Menu item for uploader companion app'
+      },
+      url: `http://localhost:3069/login`,
+      context: {
+        auth: 'REQUEST_AUTH_TOKEN'
+      }
+    },
   ],
   FEATURES: {}
 })

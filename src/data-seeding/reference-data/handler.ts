@@ -2,6 +2,7 @@ import { getClient } from './postgres'
 import Hapi from '@hapi/hapi'
 import * as z from 'zod/v4'
 import { UUID } from '@opencrvs/toolkit/events'
+import { sql } from 'kysely'
 
 export const Icd10CodeRecord = z.object({
   id: UUID,
@@ -39,6 +40,7 @@ export async function causeOfDeathSearchHandler(
           ])
         ])
       )
+      .orderBy(sql`similarity(label, ${terms}) desc`)
       .limit(50)
       .execute()
 

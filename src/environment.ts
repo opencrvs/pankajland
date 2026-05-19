@@ -19,6 +19,7 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_PORT: port({ default: 3040 }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
+  UPLOADER_APP_URL: url({ devDefault: 'http://localhost:3069/' }),
   SENTRY_DSN: str({ default: undefined }),
   TWO_FA_ENABLED: bool({ default: true }),
   OPENCRVS_ENVIRONMENT: str({ devDefault: 'development' }),
@@ -31,5 +32,10 @@ export const env = cleanEnv(process.env, {
     devDefault:
       'postgres://events_reference_data:reference_data_password@localhost:5432/events',
     desc: 'The database URL for reads and writes to `reference_data.icd10`. See `/infrastructure/postgres/setup-reference-data.sh` for how the default database is set up for your country.'
+  }),
+  SPC_CODING_DATABASE_URL: url({
+    devDefault:
+      'postgres://events_spc_coding:spc_coding_password@localhost:5432/events',
+    desc: 'The database URL for reads and writes to `spc.coding`. See `/infrastructure/postgres/setup-spc-coding.sh` for how the default database is set up for your country.'
   })
 })

@@ -67,6 +67,12 @@ export async function onRegisterHandler(
 
   await sendInformantNotification({ event, token, registrationNumber })
 
+  // When registering deaths, we need to send IDENT and MEDCOD data to SPC COD PORTAL
+  // The data should not contain any PII data.
+  // Append EXTERNAL_OPENCRVS_RECORD_ prefix to the registration number so that SPC can use it to identify records from an external OCRVS system integration.
+  // const spcData = removePIIData(event)
+  // await sendDeathDataToSPC(spcData, token)
+
   return h.response({ registrationNumber }).code(200)
 
   // OPTION 2: Immediate rejection (HTTP 400)

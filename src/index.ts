@@ -28,7 +28,8 @@ import {
   AUTH_URL,
   DEFAULT_TIMEOUT,
   GATEWAY_URL,
-  THIRTY_MINUTES_IN_MILLISECONDS
+  THIRTY_MINUTES_IN_MILLISECONDS,
+  UPLOADER_APP_URL
 } from '@countryconfig/constants'
 import {
   contentHandler,
@@ -79,6 +80,15 @@ import { createClient } from '@opencrvs/toolkit/api'
 import { Event } from './events/utils/types'
 import { syncReferenceData } from './data-seeding/reference-data/reference-data'
 import { causeOfDeathSearchHandler } from './data-seeding/reference-data/handler'
+import {
+  createSpcCodingHandler,
+  markSpcCodingProcessedHandler,
+  getPendingSpcCodingHandler
+} from './api/spc-coding/handler'
+import {
+  deathRecordCorrectionNotificationHandler,
+  deathRecordCorrectionNotificationSchema
+} from './api/death-record-correction-notification/handler'
 
 export interface ITokenPayload {
   sub: string
@@ -172,7 +182,7 @@ async function getPublicKey(): Promise<string> {
 export async function createServer() {
   let whitelist: string[] = [DOMAIN]
   if (DOMAIN[0] !== '*') {
-    whitelist = [LOGIN_URL, CLIENT_APP_URL]
+    whitelist = [LOGIN_URL, CLIENT_APP_URL, UPLOADER_APP_URL]
   }
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
@@ -514,6 +524,54 @@ export async function createServer() {
       auth: false,
       tags: ['api', 'search'],
       description: 'Fuzzy search codes with source-based priority'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/death-record-correction-notification',
+    handler: deathRecordCorrectionNotificationHandler,
+    options: {
+      tags: ['api'],
+      validate: {
+        payload: deathRecordCorrectionNotificationSchema
+      },
+      description:
+        'Sends email notification to a user about their corrected death records with cause of death codes.'
+    }
+  })
+
+  /* TODO: add authentication */
+  server.route({
+    method: 'POST',
+    path: '/spc-coding',
+    handler: createSpcCodingHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'spc-coding'],
+      description: 'Insert SPC coding result'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/spc-coding',
+    handler: getPendingSpcCodingHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'spc-coding'],
+      description: 'SPC coding results endpoint'
+    }
+  })
+
+  server.route({
+    method: 'PATCH',
+    path: '/spc-coding/processed',
+    handler: markSpcCodingProcessedHandler,
+    options: {
+      auth: false,
+      tags: ['api', 'spc-coding'],
+      description: 'Mark SPC coding rows as processed'
     }
   })
 
