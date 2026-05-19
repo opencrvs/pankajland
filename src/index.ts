@@ -85,6 +85,10 @@ import {
   markSpcCodingProcessedHandler,
   getPendingSpcCodingHandler
 } from './api/spc-coding/handler'
+import {
+  deathRecordCorrectionNotificationHandler,
+  deathRecordCorrectionNotificationSchema
+} from './api/death-record-correction-notification/handler'
 
 export interface ITokenPayload {
   sub: string
@@ -520,6 +524,20 @@ export async function createServer() {
       auth: false,
       tags: ['api', 'search'],
       description: 'Fuzzy search codes with source-based priority'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/death-record-correction-notification',
+    handler: deathRecordCorrectionNotificationHandler,
+    options: {
+      tags: ['api'],
+      validate: {
+        payload: deathRecordCorrectionNotificationSchema
+      },
+      description:
+        'Sends email notification to a user about their corrected death records with cause of death codes.'
     }
   })
 

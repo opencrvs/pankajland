@@ -8,14 +8,15 @@ export interface ProcessingResult {
   message: string;
   causesOfDeath?: string;
   irisRejectionReason?: string;
+  createdBy?: string | null;
+  /** The tracking ID of the record for display in emails */
+  trackingId?: string
 }
 
 export interface RecordsToEmail {
-  status: 'success' | 'skipped' | 'error' | 'rejected'
+  status: 'success' | 'skipped' | 'error'
   /** The tracking ID of the record for display in emails */
   trackingId?: string
-  /** The cert key of the record for display in emails */
-  certKey?: string
   /** The uc code of the record for display in emails */
   ucCode?: string
 }

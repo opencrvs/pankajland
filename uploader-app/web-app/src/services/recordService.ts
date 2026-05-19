@@ -43,6 +43,35 @@ export interface SearchResult {
 }
 
 /**
+ * Fetch user details by user ID from OpenCRVS
+ */
+export async function getUserById(
+  token: string,
+  userId: string
+): Promise<UserInfo | null> {
+  const url = new URL('events', GATEWAY_HOST).toString()
+  const client = createClient(url, `Bearer ${token}`)
+
+  try {
+    const userOrSystem = await client.user.get.query(userId)
+
+    console.log('userOrSystem :>> ', userOrSystem)
+
+    if (userOrSystem.type === 'user') {
+      return {
+        id: userOrSystem.id || userId,
+        email: userOrSystem.email,
+        firstName: userOrSystem.name.firstname,
+        lastName: userOrSystem.name.surname
+      }
+    }
+    return null
+  } catch (error) {
+    return null
+  }
+}
+
+/**
  * Find a death record by TrackingId using the OpenCRVS search API
  */
 export async function findRecordByTrackingId(
@@ -156,7 +185,7 @@ export function getCreatedByFromLegalStatuses(
 
 /**
  * Send email notification to a user about processed records
- * Uses the custom ident-uploader-notification endpoint on country config server
+ * Uses the custom death-record-correction-notification endpoint on country config server
  */
 export async function sendProcessingNotificationEmail(
   token: string,
@@ -165,13 +194,13 @@ export async function sendProcessingNotificationEmail(
 ): Promise<boolean> {
   // Use COUNTRY_CONFIG_HOST since the endpoint is defined in country config server (port 3040)
   const url = new URL(
-    'ident-uploader-notification',
+    'death-record-correction-notification',
     COUNTRY_CONFIG_HOST
   ).toString()
 
-  console.log('[IDENT-UPLOADER] Sending notification to:', userInfo.email)
-  console.log('[IDENT-UPLOADER] Record IDs:', records)
-  console.log('[IDENT-UPLOADER] URL:', url)
+  console.log('[DEATH-RECORD-CORRECTION] Sending notification to:', userInfo.email)
+  console.log('[DEATH-RECORD-CORRECTION] Record IDs:', records)
+  console.log('[DEATH-RECORD-CORRECTION] URL:', url)
 
   try {
     const response = await fetch(url, {
@@ -192,36 +221,105 @@ export async function sendProcessingNotificationEmail(
       })
     })
 
-    console.log('[IDENT-UPLOADER] Response status:', response.status)
+    console.log('[DEATH-RECORD-CORRECTION] Response status:', response.status)
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('[IDENT-UPLOADER] Error response:', errorText)
+      console.error('[DEATH-RECORD-CORRECTION] Error response:', errorText)
       return false
     }
 
     const result = await response.json()
-    console.log('[IDENT-UPLOADER] Success response:', result)
+    console.log('[DEATH-RECORD-CORRECTION] Success response:', result)
     return true
   } catch (error) {
-    console.error('[IDENT-UPLOADER] Exception:', error)
+    console.error('[DEATH-RECORD-CORRECTION] Exception:', error)
     return false
   }
 }
 
+
+/**
+ * Send email notifications to users about their processed records.
+ * Groups all successful records by createdBy user and sends ONE email per user
+ * containing all their processed record IDs.
+ */
+async function sendEmailNotifications(
+  token: string,
+  results: ProcessingResult[]
+): Promise<void> {
+  // Filter successful or rejected results that have a createdBy user
+  const successfulResults = results.filter(
+    (r) => (r.status === 'success') && r.createdBy
+  )
+
+  if (successfulResults.length === 0) {
+    return
+  }
+
+  // Group ALL records by createdBy user - one entry per user with all their records
+  const recordsByUser = new Map<string, RecordsToEmail[]>()
+  for (const result of successfulResults) {
+    if (result.createdBy) {
+    const existing = recordsByUser.get(result.createdBy) || []
+
+    const record: RecordsToEmail = {
+      status: result.status,
+      trackingId: result.trackingId || result.id,
+      ...(result.causesOfDeath
+        ? { ucCode: result.causesOfDeath }
+        : {})
+    }
+
+    existing.push(record)
+
+    recordsByUser.set(result.createdBy, existing)
+  }
+  }
+
+  // Send ONE email per user with ALL their records
+  for (const [userId, records] of recordsByUser) {
+    try {
+      const userInfo = await getUserById(token, userId)
+      
+      if (!userInfo) {
+        continue
+      }
+
+      if (!userInfo.email) {
+        continue
+      }
+ 
+      // Send single email with all record IDs for this user
+      const result = await sendProcessingNotificationEmail(
+        token,
+        userInfo,
+        records
+      )
+      console.log(
+        `[EMAIL-NOTIFICATION] Email sent to user ${userId} for ${records.length} records. Result:`,
+        result
+      )
+    } catch (error) {
+      console.error(
+        `[EMAIL-NOTIFICATION] Error sending email to user ${userId}:`,
+        error
+      )
+    }
+  }
+}
+
+
 const correctRecord = async (
+  token: string,
+  record: DeathRecord,
   row: SpcCodingDatabaseRecord,
-  token: string
 ): Promise<boolean> => {
   const url = new URL('events', GATEWAY_HOST).toString()
   const decodedToken = getDecodedToken(token)
   const client = createClient(url, `Bearer ${token}`)
-  const record = await findRecordByTrackingId(token, row.trackingId)
-  if (!record) {
-    throw new Error('Record not found.')
-  }
 
-  // Handle if assign fails due to record being assinged to another user
+  // Handle if assign fails due to record being assigned to another user
   // throw error
 
   // Check if another correction is already in progress for this record and awaiting approval
@@ -249,10 +347,6 @@ const correctRecord = async (
     'irisOutput.freeText':
       row.freeText || record?.declaration?.['irisOutput.freeText'] || ''
   }
-
-  console.log('updatedDeclaration :>> ', updatedDeclaration)
-
-  console.log('record from search API :>> ', record)
 
   const transactionId = uuidv4()
   // Request CORRECTION action
@@ -295,9 +389,16 @@ export const processRecord = async (
 ): Promise<ProcessingResult> => {
   const trackingId = row.trackingId.trim()
 
+  const record = await findRecordByTrackingId(token, row.trackingId)
+  if (!record) {
+    throw new Error('Record not found.')
+  }
+
   try {
     const causesOfDeath = row.ucCode
     const irisRejectionReason = row.freeText
+    // Extract createdBy from legalStatuses.DECLARED.createdBy
+    const createdBy = getCreatedByFromLegalStatuses(record.legalStatuses)
 
     if (row.status === 'completed' && !causesOfDeath) {
       return {
@@ -318,7 +419,7 @@ export const processRecord = async (
     }
 
     // Correct the record with the cause of death codes
-    const updated = await correctRecord(row, token)
+    const updated = await correctRecord(token, record, row)
 
     if (!updated) {
       return {
@@ -334,7 +435,9 @@ export const processRecord = async (
         id: trackingId,
         status: 'success',
         message: `Successfully updated`,
-        causesOfDeath
+        causesOfDeath,
+        createdBy: createdBy || undefined,
+        trackingId
       }
     }
     return {
@@ -342,7 +445,9 @@ export const processRecord = async (
       id: trackingId,
       status: 'success',
       message: `Successfully updated`,
-      irisRejectionReason
+      irisRejectionReason,
+      createdBy: createdBy || undefined,
+      trackingId
     }
   } catch (error) {
     return {
@@ -390,7 +495,7 @@ export const processRecords = async (
   console.log('summary :>> ', summary)
 
   // Send email notifications - one email per user with all their processed records
-  // await sendEmailNotifications(token, results)
+  await sendEmailNotifications(token, results)
 
   return summary
 }
