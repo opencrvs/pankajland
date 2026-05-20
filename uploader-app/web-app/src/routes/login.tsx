@@ -18,13 +18,11 @@ function LoginComponent() {
       { type: 'REQUEST_AUTH_TOKEN' },
       VITE_EXTERNAL_CLIENT_URL
     )
-    console.log('auth token request sent to parent')
   }, [])
 
   // Listen for AUTH_TOKEN
   useEffect(() => {
     const handler = (event: MessageEvent) => {
-      console.log('Listen for AUTH_TOKEN :>> ', event.data);
       if (event.data.type !== 'AUTH_TOKEN') {
         return
       }
@@ -43,7 +41,6 @@ function LoginComponent() {
       localStorage.setItem('authToken', token)
       setToken(token)
       navigate({ to: '/' })
-      console.log('token received and set')
     }
 
     window.addEventListener('message', handler)
