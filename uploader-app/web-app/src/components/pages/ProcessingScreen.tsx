@@ -3,7 +3,6 @@ import { Loader2, Database, CheckCircle2, AlertCircle } from 'lucide-react';
 import { ProcessingProgress } from '../../util/types';
 
 export function ProcessingScreen({ currentProgress }: { currentProgress: ProcessingProgress }) {
-  console.log('progress :>> ', currentProgress);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
       <div className="w-full max-w-2xl">

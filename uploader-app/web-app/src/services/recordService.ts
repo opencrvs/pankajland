@@ -55,8 +55,6 @@ export async function getUserById(
   try {
     const userOrSystem = await client.user.get.query(userId)
 
-    console.log('userOrSystem :>> ', userOrSystem)
-
     if (userOrSystem.type === 'user') {
       return {
         id: userOrSystem.id || userId,
@@ -198,10 +196,6 @@ export async function sendProcessingNotificationEmail(
     COUNTRY_CONFIG_HOST
   ).toString()
 
-  console.log('[DEATH-RECORD-CORRECTION] Sending notification to:', userInfo.email)
-  console.log('[DEATH-RECORD-CORRECTION] Record IDs:', records)
-  console.log('[DEATH-RECORD-CORRECTION] URL:', url)
-
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -221,8 +215,6 @@ export async function sendProcessingNotificationEmail(
       })
     })
 
-    console.log('[DEATH-RECORD-CORRECTION] Response status:', response.status)
-
     if (!response.ok) {
       const errorText = await response.text()
       console.error('[DEATH-RECORD-CORRECTION] Error response:', errorText)
@@ -230,7 +222,6 @@ export async function sendProcessingNotificationEmail(
     }
 
     const result = await response.json()
-    console.log('[DEATH-RECORD-CORRECTION] Success response:', result)
     return true
   } catch (error) {
     console.error('[DEATH-RECORD-CORRECTION] Exception:', error)
@@ -295,10 +286,6 @@ async function sendEmailNotifications(
         token,
         userInfo,
         records
-      )
-      console.log(
-        `[EMAIL-NOTIFICATION] Email sent to user ${userId} for ${records.length} records. Result:`,
-        result
       )
     } catch (error) {
       console.error(
@@ -491,8 +478,6 @@ export const processRecords = async (
     /* rejected: results.filter((r) => r.status === 'rejected').length, */
     results
   }
-
-  console.log('summary :>> ', summary)
 
   // Send email notifications - one email per user with all their processed records
   await sendEmailNotifications(token, results)
