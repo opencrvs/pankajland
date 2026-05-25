@@ -64,13 +64,12 @@ export async function onRegisterHandler(
   // Return HTTP 200 with a registration number to immediately accept the registration action.
   // This is the default implementation that automatically generates and assigns a registration number.
 
-
   type CauseLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'Other'
 
   const allowedPaths = [
     'deceased.address',
     'deceased.dob',
-    'deceased.eventDate',
+    'eventDetails.date',
     'deceased.gender'
   ]
 
@@ -88,10 +87,12 @@ export async function onRegisterHandler(
   ]
 
   for (const letter of causeLetters) {
-    allowedPaths.push(`eventDetails.causeOfDeath${letter}.interval`)
+    allowedPaths.push(`causeOfDeathDetails.causeOfDeath${letter}.interval`)
 
     for (const symptom of symptomKeys) {
-      allowedPaths.push(`eventDetails.causeOfDeath${letter}.symptom.${symptom}`)
+      allowedPaths.push(
+        `causeOfDeathDetails.causeOfDeath${letter}.symptom.${symptom}`
+      )
     }
   }
 
