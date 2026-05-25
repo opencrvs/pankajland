@@ -68,7 +68,7 @@ export async function onRegisterHandler(
   type CauseLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'Other'
 
   const allowedPaths = [
-    //'deceased.certificateKey',
+    'deceased.address',
     'deceased.dob',
     'deceased.eventDate',
     'deceased.gender'
