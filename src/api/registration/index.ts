@@ -14,6 +14,7 @@ import { createClient } from '@opencrvs/toolkit/api'
 import {
   ActionInput,
   EventDocument,
+  getAcceptedActions,
   getPendingAction
 } from '@opencrvs/toolkit/events'
 import { GATEWAY_URL } from '@countryconfig/constants'
@@ -63,7 +64,87 @@ export async function onRegisterHandler(
   // Return HTTP 200 with a registration number to immediately accept the registration action.
   // This is the default implementation that automatically generates and assigns a registration number.
 
+
+  type CauseLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'Other'
+
+  const allowedPaths = [
+    //'deceased.certificateKey',
+    'deceased.dob',
+    'deceased.eventDate',
+    'deceased.gender'
+  ]
+
+  // Add dynamic eventDetails paths
+  const causeLetters: CauseLetter[] = ['A', 'B', 'C', 'D', 'E', 'Other']
+  const symptomKeys = [
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight'
+  ]
+
+  for (const letter of causeLetters) {
+    allowedPaths.push(`eventDetails.causeOfDeath${letter}.interval`)
+
+    for (const symptom of symptomKeys) {
+      allowedPaths.push(`eventDetails.causeOfDeath${letter}.symptom.${symptom}`)
+    }
+  }
+
   const registrationNumber = generateRegistrationNumber()
+
+  if (event.type === 'death') {
+    const trackingId = event.trackingId
+
+    const acceptedActions = getAcceptedActions(event)
+
+    const declareAction = acceptedActions.find(
+      (action) => action.type === 'DECLARE'
+    )
+
+    const declaration = declareAction?.declaration || {}
+
+    const filteredDeclaration = Object.fromEntries(
+      Object.entries(declaration).filter(([key]) => allowedPaths.includes(key))
+    )
+
+    const eventPayload = {
+      ...event,
+      actions: event.actions
+        .filter((action) => action.type !== 'REGISTER')
+        .map((action) => {
+          if (action.type === 'DECLARE' && action.status === 'Requested') {
+            return { ...action, declaration: filteredDeclaration }
+          }
+          return action
+        })
+    }
+
+    const url = new URL(
+      '/insert-external-record-to-encode/TUV',
+      'https://countryconfig.spc-cod-qa.opencrvs.org'
+    ).toString()
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(eventPayload)
+      })
+      console.log('Response status from country API:', response.status)
+      if (!response.ok) {
+        console.error('Error response from country API:', await response.text())
+      }
+    } catch (error) {
+      console.error('Error sending data to country API:', error)
+    }
+  }
 
   await sendInformantNotification({ event, token, registrationNumber })
 
