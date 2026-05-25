@@ -21,6 +21,34 @@ import { GATEWAY_URL } from '@countryconfig/constants'
 import { v4 as uuidv4 } from 'uuid'
 import { sendInformantNotification } from '../notification/informantNotification'
 
+// Maps declaration keys to the structure expected by the SPC COD portal
+// eventDetails.date -> deceased.eventDate
+// causeOfDeathDetails.causeOfDeathA.interval -> eventDetails.causeOfDeathA.interval
+// causeOfDeathDetails.causeOfDeathA.symptom.one -> eventDetails.causeOfDeathA.symptom.one
+// ... and so on for other cause letters and symptoms
+
+function remapDeclarationKeys(obj) {
+  const result = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    let newKey = key
+
+    // eventDetails.date -> deceased.eventDate
+    if (key === 'eventDetails.date') {
+      newKey = 'deceased.eventDate'
+    }
+
+    // causeOfDeathDetails.* -> eventDetails.*
+    else if (key.startsWith('causeOfDeathDetails.')) {
+      newKey = key.replace('causeOfDeathDetails.', 'eventDetails.')
+    }
+
+    result[newKey] = value
+  }
+
+  return result
+}
+
 export interface ActionConfirmationRequest extends Hapi.Request {
   payload: EventDocument
 }
@@ -113,13 +141,15 @@ export async function onRegisterHandler(
       Object.entries(declaration).filter(([key]) => allowedPaths.includes(key))
     )
 
+    const mappedDeclaration = remapDeclarationKeys(filteredDeclaration)
+
     const eventPayload = {
       ...event,
       actions: event.actions
         .filter((action) => action.type !== 'REGISTER')
         .map((action) => {
           if (action.type === 'DECLARE' && action.status === 'Requested') {
-            return { ...action, declaration: filteredDeclaration }
+            return { ...action, declaration: mappedDeclaration }
           }
           return action
         })
