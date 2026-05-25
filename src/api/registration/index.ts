@@ -26,12 +26,20 @@ import { sendInformantNotification } from '../notification/informantNotification
 // causeOfDeathDetails.causeOfDeathA.interval -> eventDetails.causeOfDeathA.interval
 // causeOfDeathDetails.causeOfDeathA.symptom.one -> eventDetails.causeOfDeathA.symptom.one
 // ... and so on for other cause letters and symptoms
+// also does a value transformation step for gender to map to the expected values in the SPC COD portal
 
-function remapDeclarationKeys(obj) {
-  const result = {}
+const GENDER_MAP: Record<string, string> = {
+  MALE: '1',
+  FEMALE: '2',
+  UNKNOWN: '9'
+}
 
-  for (const [key, value] of Object.entries(obj)) {
+function remapDeclarationKeys<T extends Record<string, unknown>>(obj: T) {
+  const result: Record<string, unknown> = {}
+
+  for (const [key, originalValue] of Object.entries(obj)) {
     let newKey = key
+    let value = originalValue
 
     // eventDetails.date -> deceased.eventDate
     if (key === 'eventDetails.date') {
@@ -41,6 +49,11 @@ function remapDeclarationKeys(obj) {
     // causeOfDeathDetails.* -> eventDetails.*
     else if (key.startsWith('causeOfDeathDetails.')) {
       newKey = key.replace('causeOfDeathDetails.', 'eventDetails.')
+    }
+
+    // deceased.gender value mapping
+    if (key === 'deceased.gender' && typeof value === 'string') {
+      value = GENDER_MAP[value.toUpperCase()] ?? value
     }
 
     result[newKey] = value
