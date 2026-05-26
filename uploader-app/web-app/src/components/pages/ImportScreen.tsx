@@ -17,9 +17,9 @@ export function ImportScreen({
 }: ImportScreenProps) {
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
 
-  const readyRecords = records.filter((record) => record.status === 'completed')
+  const readyRecords = records.filter((record) => record.status === 'Final')
   const rejectedRecords = records.filter(
-    (record) => record.status === 'rejected'
+    (record) => record.status === 'Rejected'
   )
 
   const handleCopyRejectedList = () => {

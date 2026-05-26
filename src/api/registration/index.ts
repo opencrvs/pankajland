@@ -134,6 +134,9 @@ export async function onRegisterHandler(
       allowedPaths.push(
         `causeOfDeathDetails.causeOfDeath${letter}.symptom.${symptom}`
       )
+      allowedPaths.push(
+        `causeOfDeathDetails.causeOfDeath${letter}.symptom.${symptom}.other`
+      )
     }
   }
 
