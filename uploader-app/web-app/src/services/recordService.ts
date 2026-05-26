@@ -387,7 +387,7 @@ export const processRecord = async (
     // Extract createdBy from legalStatuses.DECLARED.createdBy
     const createdBy = getCreatedByFromLegalStatuses(record.legalStatuses)
 
-    if (row.status === 'completed' && !causesOfDeath) {
+    if (row.status === 'Final' && !causesOfDeath) {
       return {
         rowIndex,
         id: trackingId,
@@ -396,7 +396,7 @@ export const processRecord = async (
       }
     }
 
-    if (row.status === 'rejected' && !irisRejectionReason) {
+    if (row.status === 'Rejected' && !irisRejectionReason) {
       return {
         rowIndex,
         id: trackingId,
@@ -416,7 +416,7 @@ export const processRecord = async (
         message: 'Failed to update record'
       }
     }
-    if (row.status === 'completed' && causesOfDeath) {
+    if (row.status === 'Final' && causesOfDeath) {
       return {
         rowIndex,
         id: trackingId,
