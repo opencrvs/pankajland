@@ -479,7 +479,7 @@ export const processRecords = async (
     results
   }
 
-  // Send email notifications - one email per user with all their processed records
+  // Send email notifications - one email per user with all their processed records.
   await sendEmailNotifications(token, results)
 
   return summary
