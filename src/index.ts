@@ -552,7 +552,6 @@ export async function createServer() {
     path: '/spc-coding',
     handler: createSpcCodingHandler,
     options: {
-      auth: false,
       tags: ['api', 'spc-coding'],
       description: 'Insert SPC coding result'
     }
@@ -563,7 +562,6 @@ export async function createServer() {
     path: '/spc-coding',
     handler: getPendingSpcCodingHandler,
     options: {
-      auth: false,
       tags: ['api', 'spc-coding'],
       description: 'SPC coding results endpoint'
     }
@@ -574,7 +572,6 @@ export async function createServer() {
     path: '/spc-coding/processed',
     handler: markSpcCodingProcessedHandler,
     options: {
-      auth: false,
       tags: ['api', 'spc-coding'],
       description: 'Mark SPC coding rows as processed'
     }
