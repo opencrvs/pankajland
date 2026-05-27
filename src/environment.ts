@@ -37,5 +37,11 @@ export const env = cleanEnv(process.env, {
     devDefault:
       'postgres://events_spc_coding:spc_coding_password@localhost:5432/events',
     desc: 'The database URL for reads and writes to `spc.coding`. See `/infrastructure/postgres/setup-spc-coding.sh` for how the default database is set up for your country.'
+  }),
+  SPC_CLIENT_ID: str({ devDefault: undefined }),
+  SPC_CLIENT_SECRET: str({ devDefault: undefined }),
+  SPC_AUTH_URL: url({ devDefault: 'https://auth.spc-cod-qa.opencrvs.org' }),
+  SPC_COUNTRY_CONFIG_URL: url({
+    devDefault: 'https://countryconfig.spc-cod-qa.opencrvs.org'
   })
 })

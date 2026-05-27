@@ -17,7 +17,13 @@ import {
   getAcceptedActions,
   getPendingAction
 } from '@opencrvs/toolkit/events'
-import { GATEWAY_URL } from '@countryconfig/constants'
+import {
+  GATEWAY_URL,
+  SPC_CLIENT_ID,
+  SPC_CLIENT_SECRET,
+  SPC_COUNTRY_CONFIG_URL,
+  SPC_AUTH_URL
+} from '@countryconfig/constants'
 import { v4 as uuidv4 } from 'uuid'
 import { sendInformantNotification } from '../notification/informantNotification'
 
@@ -92,6 +98,38 @@ export interface ActionConfirmationRequest extends Hapi.Request {
  * @param {Hapi.ResponseToolkit} h - The response toolkit.
  * @returns {Hapi.Response} The response object. Should return HTTP 200, 202 or 400. With HTTP 200, the payload should contain the generated registration number.
  */
+
+type TokenResponse = { access_token: string; token_type: string }
+
+async function getAccessToken(
+  clientId: string,
+  clientSecret: string,
+  countryAuthBase: string
+): Promise<string> {
+  if (!clientId || !clientSecret) {
+    throw new Error('CLIENT_ID or CLIENT_SECRET not set in environment')
+  }
+
+  const url = new URL('/token', countryAuthBase)
+  url.searchParams.set('client_id', clientId)
+  url.searchParams.set('client_secret', clientSecret)
+  url.searchParams.set('grant_type', 'client_credentials')
+
+  console.log('Requesting access token from:', url.toString())
+  const res = await fetch(url.toString(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  if (!res.ok)
+    throw new Error(`Token request failed: ${res.status} ${await res.text()}`)
+
+  const data = (await res.json()) as TokenResponse
+  if (!data.access_token) throw new Error('Token response missing access_token')
+  return data.access_token
+}
+
 export async function onRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit
@@ -171,15 +209,22 @@ export async function onRegisterHandler(
         })
     }
 
+    const spcToken = await getAccessToken(
+      SPC_CLIENT_ID || '',
+      SPC_CLIENT_SECRET || '',
+      SPC_AUTH_URL
+    )
+
     const url = new URL(
       '/insert-external-record-to-encode/TUV',
-      'https://countryconfig.spc-cod-qa.opencrvs.org'
+      SPC_COUNTRY_CONFIG_URL
     ).toString()
 
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
+          Authorization: `Bearer ${spcToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(eventPayload)
