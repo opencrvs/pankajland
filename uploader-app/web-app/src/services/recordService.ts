@@ -118,10 +118,15 @@ type SpcCodingApiResponse = {
 /**
  * Fetch SPC Coded records from spc.coding table
  */
-export async function getPendingSPCRecords(): Promise<SpcCodingDatabaseRecord[] | []> {
+export async function getPendingSPCRecords(token: string): Promise<SpcCodingDatabaseRecord[] | []> {
   try {
     const response = await fetch(
-      new URL('spc-coding', COUNTRY_CONFIG_HOST)
+      new URL('spc-coding', COUNTRY_CONFIG_HOST),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
     )
 
     if (!response.ok) {
@@ -140,7 +145,7 @@ export async function getPendingSPCRecords(): Promise<SpcCodingDatabaseRecord[] 
  * Mark SPC coded records as processed
  */
 export async function markSPCCodedRecordsAsProcessed(
-  trackingIds: string[]
+  trackingIds: string[], token: string
 ): Promise<boolean> {
   try {
     const response = await fetch(
@@ -148,7 +153,8 @@ export async function markSPCCodedRecordsAsProcessed(
       {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           trackingIds
@@ -468,7 +474,7 @@ export const processRecords = async (
   const successfulResults = results.filter((r) => r.status === 'success')
   const successfulResultsIds = successfulResults.map((r) => r.id)
 
-  await markSPCCodedRecordsAsProcessed(successfulResultsIds)
+  await markSPCCodedRecordsAsProcessed(successfulResultsIds, token)
 
   const summary: ProcessingSummary = {
     total: results.length,

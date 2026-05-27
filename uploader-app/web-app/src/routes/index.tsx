@@ -36,11 +36,11 @@ useEffect(() => {
   if (state !== "import") {
     return;
   }
-  async function loadRecords() {
-    const records = await getPendingSPCRecords()
+  async function loadRecords(token: string) {
+    const records = await getPendingSPCRecords(token)
     setRecords(records)
   }
-  loadRecords()
+  loadRecords(token)
 }, [state])
 
   const handleProcessDatabaseRecords = async (records: SpcCodingDatabaseRecord[]) => {

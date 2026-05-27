@@ -546,7 +546,6 @@ export async function createServer() {
     }
   })
 
-  /* TODO: add authentication */
   server.route({
     method: 'POST',
     path: '/spc-coding',
