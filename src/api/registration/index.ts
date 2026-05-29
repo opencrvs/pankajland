@@ -14,7 +14,6 @@ import { createClient } from '@opencrvs/toolkit/api'
 import {
   ActionInput,
   EventDocument,
-  getAcceptedActions,
   getPendingAction
 } from '@opencrvs/toolkit/events'
 import {
@@ -26,47 +25,10 @@ import {
 } from '@countryconfig/constants'
 import { v4 as uuidv4 } from 'uuid'
 import { sendInformantNotification } from '../notification/informantNotification'
-
-// Maps declaration keys to the structure expected by the SPC COD portal
-// eventDetails.date -> deceased.eventDate
-// causeOfDeathDetails.causeOfDeathA.interval -> eventDetails.causeOfDeathA.interval
-// causeOfDeathDetails.causeOfDeathA.symptom.one -> eventDetails.causeOfDeathA.symptom.one
-// ... and so on for other cause letters and symptoms
-// also does a value transformation step for gender to map to the expected values in the SPC COD portal
-
-const GENDER_MAP: Record<string, string> = {
-  MALE: '1',
-  FEMALE: '2',
-  UNKNOWN: '9'
-}
-
-function remapDeclarationKeys<T extends Record<string, unknown>>(obj: T) {
-  const result: Record<string, unknown> = {}
-
-  for (const [key, originalValue] of Object.entries(obj)) {
-    let newKey = key
-    let value = originalValue
-
-    // eventDetails.date -> deceased.eventDate
-    if (key === 'eventDetails.date') {
-      newKey = 'deceased.eventDate'
-    }
-
-    // causeOfDeathDetails.* -> eventDetails.*
-    else if (key.startsWith('causeOfDeathDetails.')) {
-      newKey = key.replace('causeOfDeathDetails.', 'eventDetails.')
-    }
-
-    // deceased.gender value mapping
-    if (key === 'deceased.gender' && typeof value === 'string') {
-      value = GENDER_MAP[value.toUpperCase()] ?? value
-    }
-
-    result[newKey] = value
-  }
-
-  return result
-}
+import {
+  getAccessToken,
+  getSpcCompatibleEventDocument
+} from '../spc-coding/utils'
 
 export interface ActionConfirmationRequest extends Hapi.Request {
   payload: EventDocument
@@ -101,35 +63,6 @@ export interface ActionConfirmationRequest extends Hapi.Request {
 
 type TokenResponse = { access_token: string; token_type: string }
 
-async function getAccessToken(
-  clientId: string,
-  clientSecret: string,
-  countryAuthBase: string
-): Promise<string> {
-  if (!clientId || !clientSecret) {
-    throw new Error('CLIENT_ID or CLIENT_SECRET not set in environment')
-  }
-
-  const url = new URL('/token', countryAuthBase)
-  url.searchParams.set('client_id', clientId)
-  url.searchParams.set('client_secret', clientSecret)
-  url.searchParams.set('grant_type', 'client_credentials')
-
-  console.log('Requesting access token from:', url.toString())
-  const res = await fetch(url.toString(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  if (!res.ok)
-    throw new Error(`Token request failed: ${res.status} ${await res.text()}`)
-
-  const data = (await res.json()) as TokenResponse
-  if (!data.access_token) throw new Error('Token response missing access_token')
-  return data.access_token
-}
-
 export async function onRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit
@@ -143,71 +76,10 @@ export async function onRegisterHandler(
   // Return HTTP 200 with a registration number to immediately accept the registration action.
   // This is the default implementation that automatically generates and assigns a registration number.
 
-  type CauseLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'Other'
-
-  const allowedPaths = [
-    'deceased.address',
-    'deceased.dob',
-    'eventDetails.date',
-    'deceased.gender'
-  ]
-
-  // Add dynamic eventDetails paths
-  const causeLetters: CauseLetter[] = ['A', 'B', 'C', 'D', 'E', 'Other']
-  const symptomKeys = [
-    'one',
-    'two',
-    'three',
-    'four',
-    'five',
-    'six',
-    'seven',
-    'eight'
-  ]
-
-  for (const letter of causeLetters) {
-    allowedPaths.push(`causeOfDeathDetails.causeOfDeath${letter}.interval`)
-
-    for (const symptom of symptomKeys) {
-      allowedPaths.push(
-        `causeOfDeathDetails.causeOfDeath${letter}.symptom.${symptom}`
-      )
-      allowedPaths.push(
-        `causeOfDeathDetails.causeOfDeath${letter}.symptom.${symptom}.other`
-      )
-    }
-  }
-
   const registrationNumber = generateRegistrationNumber()
 
   if (event.type === 'death') {
-    const trackingId = event.trackingId
-
-    const acceptedActions = getAcceptedActions(event)
-
-    const declareAction = acceptedActions.find(
-      (action) => action.type === 'DECLARE'
-    )
-
-    const declaration = declareAction?.declaration || {}
-
-    const filteredDeclaration = Object.fromEntries(
-      Object.entries(declaration).filter(([key]) => allowedPaths.includes(key))
-    )
-
-    const mappedDeclaration = remapDeclarationKeys(filteredDeclaration)
-
-    const eventPayload = {
-      ...event,
-      actions: event.actions
-        .filter((action) => action.type !== 'REGISTER')
-        .map((action) => {
-          if (action.type === 'DECLARE' && action.status === 'Requested') {
-            return { ...action, declaration: mappedDeclaration }
-          }
-          return action
-        })
-    }
+    const spcCompatibleEventDocument = getSpcCompatibleEventDocument(event)
 
     const spcToken = await getAccessToken(
       SPC_CLIENT_ID || '',
@@ -227,7 +99,7 @@ export async function onRegisterHandler(
           Authorization: `Bearer ${spcToken}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(eventPayload)
+        body: JSON.stringify(spcCompatibleEventDocument)
       })
       console.log('Response status from country API:', response.status)
       if (!response.ok) {
@@ -239,12 +111,6 @@ export async function onRegisterHandler(
   }
 
   await sendInformantNotification({ event, token, registrationNumber })
-
-  // When registering deaths, we need to send IDENT and MEDCOD data to SPC COD PORTAL
-  // The data should not contain any PII data.
-  // Append EXTERNAL_OPENCRVS_RECORD_ prefix to the registration number so that SPC can use it to identify records from an external OCRVS system integration.
-  // const spcData = removePIIData(event)
-  // await sendDeathDataToSPC(spcData, token)
 
   return h.response({ registrationNumber }).code(200)
 

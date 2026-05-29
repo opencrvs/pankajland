@@ -82,9 +82,9 @@ const durationOptions = [
   }
 ]
 
-type CauseLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'Other'
+export type CauseLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'Other'
 
-const symptomNumber = [
+export const symptomNumber = [
   'one',
   'two',
   'three',
