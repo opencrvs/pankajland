@@ -633,7 +633,8 @@ export async function createServer() {
     handler: onCorrectionHandler,
     options: {
       tags: ['api', 'events'],
-      description: 'Receives notifications on event actions'
+      description:
+        'Sends record to SPC Mortality Portal if a correction to cause of death fields is made'
     }
   })
 
