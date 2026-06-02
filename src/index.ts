@@ -54,6 +54,7 @@ import { fontsHandler } from './api/fonts/handler'
 import {
   getEventsHandler,
   onAnyActionHandler,
+  onCorrectionHandler,
   onCustomActionHandler
 } from '@countryconfig/api/events/handler'
 import {
@@ -620,6 +621,16 @@ export async function createServer() {
     method: 'POST',
     path: `/trigger/events/${Event.Death}/actions/${ActionType.REGISTER}`,
     handler: onRegisterHandler,
+    options: {
+      tags: ['api', 'events'],
+      description: 'Receives notifications on event actions'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: `/trigger/events/${Event.Death}/actions/${ActionType.REQUEST_CORRECTION}`,
+    handler: onCorrectionHandler,
     options: {
       tags: ['api', 'events'],
       description: 'Receives notifications on event actions'
