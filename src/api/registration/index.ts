@@ -67,10 +67,6 @@ export async function onRegisterHandler(
   const event = request.payload
   const eventId = event.id
   const action = getPendingAction(event.actions)
-  const declaration = deepMerge(
-    aggregateActionDeclarations(event),
-    action.declaration
-  )
 
   // OPTION 1: Immediate acceptance (HTTP 200)
   // Return HTTP 200 with a registration number to immediately accept the registration action.
@@ -79,6 +75,10 @@ export async function onRegisterHandler(
   const registrationNumber = generateRegistrationNumber()
 
   if (event.type === 'death') {
+    const declaration = deepMerge(
+      aggregateActionDeclarations(event),
+      action.declaration
+    )
     const spcCompatibleEventDocument = getSpcCompatibleEventDocument(
       event,
       declaration
