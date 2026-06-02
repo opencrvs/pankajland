@@ -13,21 +13,17 @@ import { generateRegistrationNumber } from './registrationNumber'
 import { createClient } from '@opencrvs/toolkit/api'
 import {
   ActionInput,
+  aggregateActionDeclarations,
+  deepMerge,
   EventDocument,
   getPendingAction
 } from '@opencrvs/toolkit/events'
-import {
-  GATEWAY_URL,
-  SPC_CLIENT_ID,
-  SPC_CLIENT_SECRET,
-  SPC_COUNTRY_CONFIG_URL,
-  SPC_AUTH_URL
-} from '@countryconfig/constants'
+import { GATEWAY_URL } from '@countryconfig/constants'
 import { v4 as uuidv4 } from 'uuid'
 import { sendInformantNotification } from '../notification/informantNotification'
 import {
-  getAccessToken,
-  getSpcCompatibleEventDocument
+  getSpcCompatibleEventDocument,
+  sendRecordToSpcPortal
 } from '../spc-coding/utils'
 
 export interface ActionConfirmationRequest extends Hapi.Request {
@@ -79,35 +75,15 @@ export async function onRegisterHandler(
   const registrationNumber = generateRegistrationNumber()
 
   if (event.type === 'death') {
-    const spcCompatibleEventDocument = getSpcCompatibleEventDocument(event)
-
-    const spcToken = await getAccessToken(
-      SPC_CLIENT_ID || '',
-      SPC_CLIENT_SECRET || '',
-      SPC_AUTH_URL
+    const declaration = deepMerge(
+      aggregateActionDeclarations(event),
+      action.declaration
     )
-
-    const url = new URL(
-      '/insert-external-record-to-encode/TUV',
-      SPC_COUNTRY_CONFIG_URL
-    ).toString()
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${spcToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(spcCompatibleEventDocument)
-      })
-      console.log('Response status from country API:', response.status)
-      if (!response.ok) {
-        console.error('Error response from country API:', await response.text())
-      }
-    } catch (error) {
-      console.error('Error sending data to country API:', error)
-    }
+    const spcCompatibleEventDocument = getSpcCompatibleEventDocument(
+      event,
+      declaration
+    )
+    await sendRecordToSpcPortal(spcCompatibleEventDocument)
   }
 
   await sendInformantNotification({ event, token, registrationNumber })

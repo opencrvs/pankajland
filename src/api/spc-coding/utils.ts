@@ -1,8 +1,14 @@
 import {
+  SPC_AUTH_URL,
+  SPC_CLIENT_ID,
+  SPC_CLIENT_SECRET,
+  SPC_COUNTRY_CONFIG_URL
+} from '@countryconfig/constants'
+import {
   CauseLetter,
   symptomNumber
 } from '@countryconfig/events/death/forms/pages/causeOfDeathDetails'
-import { EventDocument, getAcceptedActions } from '@opencrvs/toolkit/events'
+import { EventDocument, FieldUpdateValue } from '@opencrvs/toolkit/events'
 
 export async function getAccessToken(
   clientId: string,
@@ -46,8 +52,10 @@ const GENDER_MAP: Record<string, string> = {
 // causeOfDeathDetails.causeOfDeathA.symptom.one -> eventDetails.causeOfDeathA.symptom.one
 // ... and so on for other cause letters and symptoms
 // also does a value transformation step for gender to map to the expected values in the SPC COD portal
-function remapDeclarationKeys<T extends Record<string, unknown>>(obj: T) {
-  const result: Record<string, unknown> = {}
+function remapDeclarationKeys<T extends Record<string, FieldUpdateValue>>(
+  obj: T
+) {
+  const result: Record<string, FieldUpdateValue> = {}
 
   for (const [key, originalValue] of Object.entries(obj)) {
     let newKey = key
@@ -74,38 +82,37 @@ function remapDeclarationKeys<T extends Record<string, unknown>>(obj: T) {
   return result
 }
 
-const causeLetters: CauseLetter[] = ['A', 'B', 'C', 'D', 'E', 'Other']
+export const causeLetters: CauseLetter[] = ['A', 'B', 'C', 'D', 'E', 'Other']
 
-const nonPIIFields = [
+const deceasedFields = [
   'deceased.address',
   'deceased.dob',
   'eventDetails.date',
   'deceased.gender'
 ]
 
-// Add dynamic causeOfDeathDetails fields based on cause letters and symptom keys, to nonPIIFields array:
+export const causeOfDeathFields: string[] = []
+
+// Add dynamic causeOfDeathDetails fields based on cause letters and symptom keys, to causeOfDeathFields array:
 for (const letter of causeLetters) {
-  nonPIIFields.push(`causeOfDeathDetails.causeOfDeath${letter}.interval`)
+  causeOfDeathFields.push(`causeOfDeathDetails.causeOfDeath${letter}.interval`)
 
   for (const symptom of symptomNumber) {
-    nonPIIFields.push(
+    causeOfDeathFields.push(
       `causeOfDeathDetails.causeOfDeath${letter}.symptom.${symptom}`
     )
-    nonPIIFields.push(
+    causeOfDeathFields.push(
       `causeOfDeathDetails.causeOfDeath${letter}.symptom.${symptom}.other`
     )
   }
 }
 
-export function getSpcCompatibleEventDocument(event: EventDocument) {
-  const acceptedActions = getAcceptedActions(event)
+const nonPIIFields = [...deceasedFields, ...causeOfDeathFields]
 
-  const declareAction = acceptedActions.find(
-    (action) => action.type === 'DECLARE'
-  )
-
-  const declaration = declareAction?.declaration || {}
-
+export function getSpcCompatibleEventDocument(
+  event: EventDocument,
+  declaration: Record<string, FieldUpdateValue>
+) {
   const declarationWithoutPIIData = Object.fromEntries(
     Object.entries(declaration).filter(([key]) => nonPIIFields.includes(key))
   )
@@ -114,17 +121,66 @@ export function getSpcCompatibleEventDocument(event: EventDocument) {
     declarationWithoutPIIData
   )
 
+  const excludedActionTypes = [
+    'REGISTER',
+    'REQUEST_CORRECTION',
+    'APPROVE_CORRECTION'
+  ]
+
   const spcCompatibleEventDocument = {
     ...event,
     actions: event.actions
-      .filter((action) => action.type !== 'REGISTER')
+      .filter((action) => !excludedActionTypes.includes(action.type))
       .map((action) => {
         if (action.type === 'DECLARE' && action.status === 'Requested') {
-          return { ...action, declaration: spcCompatibleDeclaration }
+          return {
+            ...action,
+            declaration: spcCompatibleDeclaration
+          }
         }
         return action
       })
   }
 
   return spcCompatibleEventDocument
+}
+
+export function extractCodFields(
+  obj: Record<string, FieldUpdateValue>,
+  fields: string[]
+): Record<string, FieldUpdateValue> {
+  const fieldSet = new Set(fields)
+
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key]) => fieldSet.has(key))
+  )
+}
+
+export async function sendRecordToSpcPortal(event: EventDocument) {
+  const spcToken = await getAccessToken(
+    SPC_CLIENT_ID || '',
+    SPC_CLIENT_SECRET || '',
+    SPC_AUTH_URL
+  )
+  const url = new URL(
+    '/insert-external-record-to-encode/TUV',
+    SPC_COUNTRY_CONFIG_URL
+  ).toString()
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${spcToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(event)
+    })
+    console.log('Response status from country API:', response.status)
+    if (!response.ok) {
+      console.error('Error response from country API:', await response.text())
+    }
+  } catch (error) {
+    console.error('Error sending data to country API:', error)
+  }
 }
