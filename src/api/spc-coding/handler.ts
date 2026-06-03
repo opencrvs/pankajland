@@ -61,22 +61,64 @@ export async function createSpcCodingHandler(
   const payload = request.payload as SpcCodingDatabaseRecord
 
   try {
-    const insertedRow = await db
-      .insertInto('spc.coding')
-      .values({
-        trackingId: payload.trackingId,
-        status: payload.status,
-        ucCode: payload.ucCode,
-        selectedCodes: JSON.stringify(payload.selectedCodes),
-        multipleCodes: JSON.stringify(payload.multipleCodes),
-        freeText: payload.freeText,
-        comments: payload.comments,
-        processedBySystem: payload.processedBySystem
-      })
-      .returningAll()
+    const existingRow = await db
+      .selectFrom('spc.coding')
+      .selectAll()
+      .where('trackingId', '=', payload.trackingId)
       .executeTakeFirst()
 
-    return h.response({ result: insertedRow }).code(201)
+    if (!existingRow) {
+      const insertedRow = await db
+        .insertInto('spc.coding')
+        .values({
+          trackingId: payload.trackingId,
+          status: payload.status,
+          ucCode: payload.ucCode,
+          selectedCodes: JSON.stringify(payload.selectedCodes),
+          multipleCodes: JSON.stringify(payload.multipleCodes),
+          freeText: payload.freeText,
+          comments: payload.comments,
+          processedBySystem: payload.processedBySystem
+        })
+        .returningAll()
+        .executeTakeFirst()
+
+      return h.response({ result: insertedRow }).code(201)
+    }
+
+    if (existingRow.status === 'Final') {
+      return h
+        .response({
+          error: `Tracking ID ${payload.trackingId} has already been finalized`
+        })
+        .code(409)
+    }
+
+    if (existingRow.status === 'Rejected') {
+      const updatedRow = await db
+        .updateTable('spc.coding')
+        .set({
+          status: payload.status,
+          ucCode: payload.ucCode,
+          selectedCodes: JSON.stringify(payload.selectedCodes),
+          multipleCodes: JSON.stringify(payload.multipleCodes),
+          freeText: payload.freeText,
+          comments: payload.comments,
+          // Reset because the record needs processing again
+          processedBySystem: null
+        })
+        .where('trackingId', '=', payload.trackingId)
+        .returningAll()
+        .executeTakeFirst()
+
+      return h.response({ result: updatedRow }).code(200)
+    }
+
+    return h
+      .response({
+        error: `Unsupported status: ${existingRow.status}`
+      })
+      .code(400)
   } catch (err) {
     request.log(['error'], err)
 
