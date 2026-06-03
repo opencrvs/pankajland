@@ -74,8 +74,8 @@ export async function createSpcCodingHandler(
           trackingId: payload.trackingId,
           status: payload.status,
           ucCode: payload.ucCode,
-          selectedCodes: JSON.stringify(payload.selectedCodes),
-          multipleCodes: JSON.stringify(payload.multipleCodes),
+          selectedCodes: payload.selectedCodes,
+          multipleCodes: payload.multipleCodes,
           freeText: payload.freeText,
           comments: payload.comments,
           processedBySystem: payload.processedBySystem
@@ -100,12 +100,12 @@ export async function createSpcCodingHandler(
         .set({
           status: payload.status,
           ucCode: payload.ucCode,
-          selectedCodes: JSON.stringify(payload.selectedCodes),
-          multipleCodes: JSON.stringify(payload.multipleCodes),
-          freeText: payload.freeText,
+          selectedCodes: payload.selectedCodes,
+          multipleCodes: payload.multipleCodes,
           comments: payload.comments,
           // Reset because the record needs processing again
-          processedBySystem: null
+          processedBySystem: null,
+          freeText: null
         })
         .where('trackingId', '=', payload.trackingId)
         .returningAll()
