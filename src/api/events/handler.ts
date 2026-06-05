@@ -75,6 +75,42 @@ export async function onCorrectionHandler(
   return h.response().code(200)
 }
 
+export async function onNotificationHandler(
+  request: ActionConfirmationRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const event = request.payload
+  const eventActions = event.actions
+  const pendingAction = getPendingAction(eventActions)
+  const notificationDeclaration = pendingAction.declaration
+
+  const requiredFields = ['deceased.gender', 'eventDetails.date']
+
+  const hasAllRequiredFields = requiredFields.every((key) =>
+    Object.prototype.hasOwnProperty.call(notificationDeclaration, key)
+  )
+
+  const hasAtLeastOneSymptom = causeOfDeathFields.some((key) =>
+    Object.prototype.hasOwnProperty.call(notificationDeclaration, key)
+  )
+
+  const shouldSendToSpc = hasAllRequiredFields && hasAtLeastOneSymptom
+
+  if (shouldSendToSpc) {
+    const spcCompatibleEventDocument = getSpcCompatibleEventDocument(
+      event,
+      notificationDeclaration
+    )
+    await sendRecordToSpcPortal(spcCompatibleEventDocument)
+  } else {
+    console.log(
+      'Notification declaration is missing required fields or symptoms, skipping sending to SPC'
+    )
+  }
+
+  return h.response().code(200)
+}
+
 /**
  * This catch-all action route will receive event actions with `Content-Type: application/json`
  */

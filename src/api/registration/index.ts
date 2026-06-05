@@ -57,8 +57,6 @@ export interface ActionConfirmationRequest extends Hapi.Request {
  * @returns {Hapi.Response} The response object. Should return HTTP 200, 202 or 400. With HTTP 200, the payload should contain the generated registration number.
  */
 
-type TokenResponse = { access_token: string; token_type: string }
-
 export async function onRegisterHandler(
   request: ActionConfirmationRequest,
   h: Hapi.ResponseToolkit

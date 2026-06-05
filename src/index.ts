@@ -55,7 +55,8 @@ import {
   getEventsHandler,
   onAnyActionHandler,
   onCorrectionHandler,
-  onCustomActionHandler
+  onCustomActionHandler,
+  onNotificationHandler
 } from '@countryconfig/api/events/handler'
 import {
   ActionDocument,
@@ -635,6 +636,17 @@ export async function createServer() {
       tags: ['api', 'events'],
       description:
         'Sends record to SPC Mortality Portal if a correction to cause of death fields is made'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: `/trigger/events/${Event.Death}/actions/${ActionType.NOTIFY}`,
+    handler: onNotificationHandler,
+    options: {
+      tags: ['api', 'events'],
+      description:
+        'Sends record to SPC Mortality Portal if a death notification is made'
     }
   })
 

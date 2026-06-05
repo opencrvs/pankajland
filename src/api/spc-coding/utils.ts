@@ -10,6 +10,8 @@ import {
 } from '@countryconfig/events/death/forms/pages/causeOfDeathDetails'
 import { EventDocument, FieldUpdateValue } from '@opencrvs/toolkit/events'
 
+type TokenResponse = { access_token: string; token_type: string }
+
 export async function getAccessToken(
   clientId: string,
   clientSecret: string,
@@ -132,6 +134,12 @@ export function getSpcCompatibleEventDocument(
     actions: event.actions
       .filter((action) => !excludedActionTypes.includes(action.type))
       .map((action) => {
+        if (action.type === 'NOTIFY' && action.status === 'Requested') {
+          return {
+            ...action,
+            declaration: spcCompatibleDeclaration
+          }
+        }
         if (action.type === 'DECLARE' && action.status === 'Requested') {
           return {
             ...action,
