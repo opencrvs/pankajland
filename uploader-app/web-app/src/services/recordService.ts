@@ -375,6 +375,70 @@ const correctRecord = async (
   return approveCorrectionResult
 }
 
+const editRecord = async (
+  token: string,
+  record: DeathRecord,
+  row: SpcCodingDatabaseRecord,
+): Promise<boolean> => {
+  const url = new URL('events', GATEWAY_HOST).toString()
+  const decodedToken = getDecodedToken(token)
+  const client = createClient(url, `Bearer ${token}`)
+
+  const assignmentResult = await client.event.actions.assignment.assign.mutate({
+    type: 'ASSIGN',
+    eventId: record.id,
+    transactionId: uuidv4(),
+    assignedTo: decodedToken?.sub || 'unknown-user',
+    annotation: {}
+  })
+
+  const updatedDeclaration = {
+    ...record?.declaration,
+    'irisOutput.ucCode':
+      row.ucCode || record?.declaration?.['irisOutput.ucCode'] || '',
+    'irisOutput.selectedCodes':
+      row.selectedCodes ||
+      record?.declaration?.['irisOutput.selectedCodes'] ||
+      '',
+    'irisOutput.multipleCodes':
+      row.multipleCodes ||
+      record?.declaration?.['irisOutput.multipleCodes'] ||
+      '',
+    'irisOutput.freeText':
+      row.freeText || record?.declaration?.['irisOutput.freeText'] || ''
+  }
+
+  const transactionId = uuidv4()
+  // Request EDIT action
+  const editResult =
+    await client.event.actions.edit.request.mutate({
+      eventId: record.id,
+      declaration: updatedDeclaration,
+      transactionId: transactionId,
+      annotation: {},
+      keepAssignment: true
+    })
+
+  const requestId = editResult.actions.find(
+    (a: ActionBase) =>
+      a.transactionId === transactionId && a.status === ActionStatus.Accepted
+  )?.id
+
+  if (!requestId) {
+    throw new Error(
+      `Request ID not found in response for eventId: ${record.id}, transactionId: ${transactionId}`
+    )
+  }
+
+  const approveEditResult =
+    await client.event.actions.edit.accept.mutate({
+      eventId: record.id,
+      transactionId: uuidv4(),
+      requestId
+    })
+  return approveEditResult
+}
+
 export const processRecord = async (
   row: SpcCodingDatabaseRecord,
   rowIndex: number,
@@ -411,8 +475,14 @@ export const processRecord = async (
       }
     }
 
-    // Correct the record with the cause of death codes
-    const updated = await correctRecord(token, record, row)
+    let updated
+
+    // If the declaration has not been registered do an editRecord call instead which uses ActionType.EDIT
+    if (record.status !== 'REGISTERED') {
+      updated = await editRecord(token, record, row)
+    }
+
+    updated = await correctRecord(token, record, row)
 
     if (!updated) {
       return {
