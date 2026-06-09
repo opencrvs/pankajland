@@ -126,7 +126,13 @@ jobs:
           while read line; do
             [ -z "$line" ] && continue # Skip empty lines
             KEY=$(echo "$line" | cut -d'=' -f1)
-            echo $KEY | grep -iq github && continue # Skip GitHub token secrets
+            if echo "$KEY" | grep -iq MIGRATION_GH_TOKEN || echo "$KEY" | grep -iq gh_token; then
+              KEY=GH_TOKEN
+              echo "  ⚠️ Using replacement value for MIGRATION_GH_TOKEN secret: $KEY instead of actual value"
+            elif echo "$KEY" | grep -iq github || echo "$KEY" | grep -iq gh_token; then
+              echo "  ⚠️ Skipping secret: $KEY"
+              continue
+            fi
             VALUE=$(echo "$line" | cut -d'=' -f2-)
             DECODED_VALUE=$(echo "$VALUE" | base64 -d)
             echo "  ✓ Setting secret: $KEY"
@@ -206,7 +212,13 @@ jobs:
             [ -z "$line" ] && continue # Skip empty lines
             KEY=$(echo "$line" | cut -d'=' -f1)
             VALUE=$(echo "$line" | cut -d'=' -f2-)
-            echo $KEY | grep -iq github && continue # Skip GitHub token secrets
+            if echo "$KEY" | grep -iq MIGRATION_GH_TOKEN || echo "$KEY" | grep -iq gh_token; then
+              KEY=GH_TOKEN
+              echo "  ⚠️ Using replacement value for MIGRATION_GH_TOKEN secret: $KEY instead of actual value"
+            elif echo "$KEY" | grep -iq github || echo "$KEY" | grep -iq gh_token; then
+              echo "  ⚠️ Skipping secret: $KEY"
+              continue
+            fi
             echo $SECRETS_LIST | grep -q "$KEY" || { SKIPPED_KEYS+=("$KEY") && continue; }
             DECODED_VALUE=$(echo "$VALUE" | base64 -d)
             echo "  ✓ Setting secret: $KEY"

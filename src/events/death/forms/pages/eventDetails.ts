@@ -223,6 +223,7 @@ export const eventDetails = defineFormPage({
         description: 'This is the label for the field',
         id: 'event.death.action.declare.form.section.deceased.field.deathLocation.label'
       },
+      parent: field('eventDetails.placeOfDeath'),
       conditionals: [
         {
           type: ConditionalType.SHOW,
@@ -257,6 +258,7 @@ export const eventDetails = defineFormPage({
           )
         }
       ],
+      parent: field('eventDetails.placeOfDeath'),
       validation: [
         {
           message: {
