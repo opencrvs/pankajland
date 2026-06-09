@@ -22,16 +22,18 @@ export async function getAccessToken(
   }
 
   const url = new URL('/token', countryAuthBase)
-  url.searchParams.set('client_id', clientId)
-  url.searchParams.set('client_secret', clientSecret)
-  url.searchParams.set('grant_type', 'client_credentials')
 
   console.log('Requesting access token from:', url.toString())
   const res = await fetch(url.toString(), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
-    }
+    },
+    body: JSON.stringify({
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: 'client_credentials'
+    })
   })
   if (!res.ok)
     throw new Error(`Token request failed: ${res.status} ${await res.text()}`)
