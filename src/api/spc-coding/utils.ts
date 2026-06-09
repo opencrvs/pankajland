@@ -21,7 +21,7 @@ export async function getAccessToken(
     throw new Error('CLIENT_ID or CLIENT_SECRET not set in environment')
   }
 
-  const url = new URL('/token', countryAuthBase)
+  const url = new URL('token', countryAuthBase)
 
   console.log('Requesting access token from:', url.toString())
   const res = await fetch(url.toString(), {
