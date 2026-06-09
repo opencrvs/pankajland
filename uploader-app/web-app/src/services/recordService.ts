@@ -1,6 +1,12 @@
 import { GATEWAY_HOST, COUNTRY_CONFIG_HOST } from '../util/constants'
 import { createClient } from '@opencrvs/toolkit/api'
-import { UserInfo, RecordsToEmail, SpcCodingDatabaseRecord, ProcessingResult, ProcessingSummary } from '../util/types'
+import {
+  UserInfo,
+  RecordsToEmail,
+  SpcCodingDatabaseRecord,
+  ProcessingResult,
+  ProcessingSummary
+} from '../util/types'
 import { ActionBase, ActionStatus } from '@opencrvs/toolkit/events'
 import { getDecodedToken } from './token'
 import { v4 as uuidv4 } from 'uuid'
@@ -84,10 +90,12 @@ export async function findRecordByTrackingId(
       query: {
         type: 'and',
         clauses: [
-          {trackingId: {
-            term: trackingId,
-            type: 'exact'
-          } }
+          {
+            trackingId: {
+              term: trackingId,
+              type: 'exact'
+            }
+          }
         ]
       },
       limit: 1,
@@ -118,16 +126,15 @@ type SpcCodingApiResponse = {
 /**
  * Fetch SPC Coded records from spc.coding table
  */
-export async function getPendingSPCRecords(token: string): Promise<SpcCodingDatabaseRecord[] | []> {
+export async function getPendingSPCRecords(
+  token: string
+): Promise<SpcCodingDatabaseRecord[] | []> {
   try {
-    const response = await fetch(
-      new URL('spc-coding', COUNTRY_CONFIG_HOST),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+    const response = await fetch(new URL('spc-coding', COUNTRY_CONFIG_HOST), {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    )
+    })
 
     if (!response.ok) {
       return []
@@ -145,7 +152,8 @@ export async function getPendingSPCRecords(token: string): Promise<SpcCodingData
  * Mark SPC coded records as processed
  */
 export async function markSPCCodedRecordsAsProcessed(
-  trackingIds: string[], token: string
+  trackingIds: string[],
+  token: string
 ): Promise<boolean> {
   try {
     const response = await fetch(
@@ -167,7 +175,6 @@ export async function markSPCCodedRecordsAsProcessed(
     return false
   }
 }
-
 
 /**
  * Extract the createdBy user ID from the DECLARED legal status
@@ -235,7 +242,6 @@ export async function sendProcessingNotificationEmail(
   }
 }
 
-
 /**
  * Send email notifications to users about their processed records.
  * Groups all successful records by createdBy user and sends ONE email per user
@@ -247,7 +253,7 @@ async function sendEmailNotifications(
 ): Promise<void> {
   // Filter successful or rejected results that have a createdBy user
   const successfulResults = results.filter(
-    (r) => (r.status === 'success') && r.createdBy
+    (r) => r.status === 'success' && r.createdBy
   )
 
   if (successfulResults.length === 0) {
@@ -258,27 +264,25 @@ async function sendEmailNotifications(
   const recordsByUser = new Map<string, RecordsToEmail[]>()
   for (const result of successfulResults) {
     if (result.createdBy) {
-    const existing = recordsByUser.get(result.createdBy) || []
+      const existing = recordsByUser.get(result.createdBy) || []
 
-    const record: RecordsToEmail = {
-      status: result.status,
-      trackingId: result.trackingId || result.id,
-      ...(result.causesOfDeath
-        ? { ucCode: result.causesOfDeath }
-        : {})
+      const record: RecordsToEmail = {
+        status: result.status,
+        trackingId: result.trackingId || result.id,
+        ...(result.causesOfDeath ? { ucCode: result.causesOfDeath } : {})
+      }
+
+      existing.push(record)
+
+      recordsByUser.set(result.createdBy, existing)
     }
-
-    existing.push(record)
-
-    recordsByUser.set(result.createdBy, existing)
-  }
   }
 
   // Send ONE email per user with ALL their records
   for (const [userId, records] of recordsByUser) {
     try {
       const userInfo = await getUserById(token, userId)
-      
+
       if (!userInfo) {
         continue
       }
@@ -286,7 +290,7 @@ async function sendEmailNotifications(
       if (!userInfo.email) {
         continue
       }
- 
+
       // Send single email with all record IDs for this user
       const result = await sendProcessingNotificationEmail(
         token,
@@ -302,11 +306,10 @@ async function sendEmailNotifications(
   }
 }
 
-
 const correctRecord = async (
   token: string,
   record: DeathRecord,
-  row: SpcCodingDatabaseRecord,
+  row: SpcCodingDatabaseRecord
 ): Promise<boolean> => {
   const url = new URL('events', GATEWAY_HOST).toString()
   const decodedToken = getDecodedToken(token)
@@ -375,10 +378,10 @@ const correctRecord = async (
   return approveCorrectionResult
 }
 
-const editRecord = async (
+const editAndDeclareRecord = async (
   token: string,
   record: DeathRecord,
-  row: SpcCodingDatabaseRecord,
+  row: SpcCodingDatabaseRecord
 ): Promise<boolean> => {
   const url = new URL('events', GATEWAY_HOST).toString()
   const decodedToken = getDecodedToken(token)
@@ -410,14 +413,13 @@ const editRecord = async (
 
   const transactionId = uuidv4()
   // Request EDIT action
-  const editResult =
-    await client.event.actions.edit.request.mutate({
-      eventId: record.id,
-      declaration: updatedDeclaration,
-      transactionId: transactionId,
-      annotation: {},
-      keepAssignment: true
-    })
+  const editResult = await client.event.actions.edit.request.mutate({
+    eventId: record.id,
+    declaration: updatedDeclaration,
+    transactionId: transactionId,
+    annotation: {},
+    keepAssignment: true
+  })
 
   const requestId = editResult.actions.find(
     (a: ActionBase) =>
@@ -430,13 +432,42 @@ const editRecord = async (
     )
   }
 
-  const approveEditResult =
-    await client.event.actions.edit.accept.mutate({
-      eventId: record.id,
-      transactionId: uuidv4(),
-      requestId
-    })
-  return approveEditResult
+  const approveEditResult = await client.event.actions.edit.accept.mutate({
+    eventId: record.id,
+    transactionId: uuidv4(),
+    requestId
+  })
+
+  const declareTransactionId = uuidv4()
+
+  // Request DECLARE action
+  const declareResult = await client.event.actions.declare.request.mutate({
+    eventId: record.id,
+    declaration: updatedDeclaration,
+    transactionId: declareTransactionId,
+    annotation: {},
+    keepAssignment: true
+  })
+
+  const declareRequestId = declareResult.actions.find(
+    (a: ActionBase) =>
+      a.transactionId === declareTransactionId &&
+      a.status === ActionStatus.Accepted
+  )?.id
+
+  if (!declareRequestId) {
+    throw new Error(
+      `Request ID not found in response for eventId: ${record.id}, transactionId: ${declareTransactionId}`
+    )
+  }
+
+  const approveDeclareResult = await client.event.actions.declare.accept.mutate({
+    eventId: record.id,
+    transactionId: uuidv4(),
+    requestId: declareRequestId
+  })
+
+  return approveDeclareResult
 }
 
 export const processRecord = async (
@@ -477,9 +508,9 @@ export const processRecord = async (
 
     let updated
 
-    // If the declaration has not been registered do an editRecord call instead which uses ActionType.EDIT
+    // If the declaration has not been registered do an editAndDeclareRecord call
     if (record.status !== 'REGISTERED') {
-      updated = await editRecord(token, record, row)
+      updated = await editAndDeclareRecord(token, record, row)
     }
 
     updated = await correctRecord(token, record, row)
