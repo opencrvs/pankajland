@@ -15,7 +15,9 @@ import { ActionConfirmationRequest } from '../registration'
 import {
   aggregateActionDeclarations,
   deepMerge,
-  getPendingAction
+  EventDocument,
+  getPendingAction,
+  UUID
 } from '@opencrvs/toolkit/events'
 import {
   causeOfDeathFields,
@@ -23,6 +25,7 @@ import {
   getSpcCompatibleEventDocument,
   sendRecordToSpcPortal
 } from '../spc-coding/utils'
+import { v4 as uuidv4 } from 'uuid'
 
 export function getEventsHandler(_: Hapi.Request, h: Hapi.ResponseToolkit) {
   return h.response(eventConfigs).code(200)
@@ -96,9 +99,25 @@ export async function onNotificationHandler(
 
   const shouldSendToSpc = hasAllRequiredFields && hasAtLeastOneSymptom
 
+  const { annotation, ...pendingActionWithoutAnnotation } = pendingAction
+
+  const eventWithAcceptedNotifyAction: EventDocument = {
+    ...event,
+    actions: [
+      ...event.actions,
+      {
+        ...pendingActionWithoutAnnotation,
+        id: uuidv4() as UUID,
+        declaration: {},
+        status: 'Accepted',
+        originalActionId: pendingAction.id
+      }
+    ]
+  }
+
   if (shouldSendToSpc) {
     const spcCompatibleEventDocument = getSpcCompatibleEventDocument(
-      event,
+      eventWithAcceptedNotifyAction,
       notificationDeclaration
     )
     await sendRecordToSpcPortal(spcCompatibleEventDocument)
