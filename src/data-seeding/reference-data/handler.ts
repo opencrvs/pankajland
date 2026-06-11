@@ -30,17 +30,24 @@ export async function causeOfDeathSearchHandler(
   try {
     const rows = await db
       .selectFrom('icd10')
-      .select(['id', 'label'])
+      .select([
+        'id',
+        'label',
+        sql<number>`similarity(label, ${terms})`.as('score')
+      ])
       .where((eb) =>
         eb.and([
-          eb('label', 'ilike', likeTerm),
+          eb.or([
+            eb('label', 'ilike', likeTerm),
+            sql<boolean>`label % ${terms}`
+          ]),
           eb.or([
             eb('valid_until', 'is', null),
             eb('valid_until', '>', new Date())
           ])
         ])
       )
-      .orderBy(sql`similarity(label, ${terms}) desc`)
+      .orderBy('score desc')
       .limit(50)
       .execute()
 
