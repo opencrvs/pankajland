@@ -465,8 +465,8 @@ const editAndDeclareRecord = async (
 
   const approveDeclareResult = await client.event.actions.declare.accept.mutate({
     eventId: record.id,
-    transactionId: uuidv4(),
-    requestId: declareRequestId
+    actionId: declareRequestId,
+    transactionId: uuidv4()
   })
 
   return approveDeclareResult
