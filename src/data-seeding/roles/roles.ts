@@ -98,6 +98,7 @@ export const roles: Role[] = [
         options: { placeOfEvent: 'administrativeArea' }
       },
       { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
+      { type: 'record.confirm-registration' },
       {
         type: 'record.reject',
         options: { placeOfEvent: 'administrativeArea' }
