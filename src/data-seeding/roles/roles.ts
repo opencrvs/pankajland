@@ -99,6 +99,7 @@ export const roles: Role[] = [
       },
       { type: 'record.edit', options: { placeOfEvent: 'administrativeArea' } },
       { type: 'record.confirm-registration' },
+      { type: 'record.reject-registration' },
       {
         type: 'record.reject',
         options: { placeOfEvent: 'administrativeArea' }
