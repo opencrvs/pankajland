@@ -418,7 +418,8 @@ const editAndDeclareRecord = async (
     declaration: updatedDeclaration,
     transactionId: transactionId,
     annotation: {},
-    keepAssignment: true
+    keepAssignment: true,
+    content: {}
   })
 
   const requestId = editResult.actions.find(
