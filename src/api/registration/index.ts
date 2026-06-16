@@ -77,11 +77,24 @@ export async function onRegisterHandler(
       aggregateActionDeclarations(event),
       action.declaration
     )
-    const spcCompatibleEventDocument = getSpcCompatibleEventDocument(
-      event,
-      declaration
-    )
-    await sendRecordToSpcPortal(spcCompatibleEventDocument)
+
+    // If the registration request declaration is already encoded by SPC
+    // then we can skip sending the record to SPC again
+    if (
+      declaration['irisOutput.ucCode'] ||
+      declaration['irisOutput.multipleCodes'] ||
+      declaration['irisOutput.selectedCodes']
+    ) {
+      console.log(
+        'Declaration already contains COD coding information, skipping sending to SPC'
+      )
+    } else {
+      const spcCompatibleEventDocument = getSpcCompatibleEventDocument(
+        event,
+        declaration
+      )
+      await sendRecordToSpcPortal(spcCompatibleEventDocument)
+    }
   }
 
   await sendInformantNotification({ event, token, registrationNumber })
