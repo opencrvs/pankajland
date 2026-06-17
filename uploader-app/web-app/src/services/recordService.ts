@@ -378,7 +378,7 @@ const correctRecord = async (
   return approveCorrectionResult
 }
 
-const editAndDeclareRecord = async (
+const editRecord = async (
   token: string,
   record: DeathRecord,
   row: SpcCodingDatabaseRecord
@@ -418,7 +418,6 @@ const editAndDeclareRecord = async (
     declaration: updatedDeclaration,
     transactionId: transactionId,
     annotation: {},
-    keepAssignment: true,
     content: {}
   })
 
@@ -433,43 +432,7 @@ const editAndDeclareRecord = async (
     )
   }
 
-  const approveEditResult = await client.event.actions.edit.accept.mutate({
-    eventId: record.id,
-    actionId: requestId,
-    transactionId: uuidv4(),
-    content: {}
-  })
-
-  const declareTransactionId = uuidv4()
-
-  // Request DECLARE action
-  const declareResult = await client.event.actions.declare.request.mutate({
-    eventId: record.id,
-    declaration: updatedDeclaration,
-    transactionId: declareTransactionId,
-    annotation: {},
-    keepAssignment: true
-  })
-
-  const declareRequestId = declareResult.actions.find(
-    (a: ActionBase) =>
-      a.transactionId === declareTransactionId &&
-      a.status === ActionStatus.Accepted
-  )?.id
-
-  if (!declareRequestId) {
-    throw new Error(
-      `Request ID not found in response for eventId: ${record.id}, transactionId: ${declareTransactionId}`
-    )
-  }
-
-  const approveDeclareResult = await client.event.actions.declare.accept.mutate({
-    eventId: record.id,
-    actionId: declareRequestId,
-    transactionId: uuidv4()
-  })
-
-  return approveDeclareResult
+  return true
 }
 
 export const processRecord = async (
@@ -510,12 +473,13 @@ export const processRecord = async (
 
     let updated
 
-    // If the declaration has not been registered do an editAndDeclareRecord call
+    // If the declaration has not been registered do an editRecord call
     if (record.status !== 'REGISTERED') {
-      updated = await editAndDeclareRecord(token, record, row)
+      updated = await editRecord(token, record, row)
+    } else {
+      updated = await correctRecord(token, record, row)
     }
 
-    updated = await correctRecord(token, record, row)
 
     if (!updated) {
       return {
