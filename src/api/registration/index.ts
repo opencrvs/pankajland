@@ -81,9 +81,9 @@ export async function onRegisterHandler(
     // If the registration request declaration is already encoded by SPC
     // then we can skip sending the record to SPC again
     if (
-      declaration['irisOutput.ucCode'] ||
-      declaration['irisOutput.multipleCodes'] ||
-      declaration['irisOutput.selectedCodes']
+      declaration['irisOutput.ucCode'] !== 'None' ||
+      declaration['irisOutput.multipleCodes'] !== 'None' ||
+      declaration['irisOutput.selectedCodes'] !== 'None'
     ) {
       console.log(
         'Declaration already contains COD coding information, skipping sending to SPC'
