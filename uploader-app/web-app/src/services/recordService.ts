@@ -446,7 +446,7 @@ export const processRecord = async (
   if (!record) {
     throw new Error('Record not found.')
   }
-
+  const assignedTo=record?.assignedTo || ""
   try {
     const causesOfDeath = row.ucCode
     const irisRejectionReason = row.freeText
@@ -510,11 +510,32 @@ export const processRecord = async (
       trackingId
     }
   } catch (error) {
-    return {
-      rowIndex,
-      id: trackingId,
-      status: 'error',
-      message: error instanceof Error ? error.message : 'Unknown error occurred'
+    if (error instanceof Error && error.message === 'CONFLICT') {
+      const userInfo = await getUserById(token, assignedTo)
+      if (userInfo) {
+        return {
+          rowIndex,
+          id: trackingId,
+          status: 'error',
+          message: `Unable to process this record because it is currently assigned to ${userInfo.firstName} ${userInfo.lastName}. Please ask ${userInfo.firstName} ${userInfo.lastName} to unassign the record first, then re-process the encoded record again.`
+        }
+      } else {
+        // should not happen as assignedTo should have a value now
+        return {
+          rowIndex,
+          id: trackingId,
+          status: 'error',
+          message: `Unable to process this record because it is currently assigned to another unknown user. Please ask them to unassign the record first, then re-process the encoded record again.`
+        }
+      }
+    } else {
+      return {
+        rowIndex,
+        id: trackingId,
+        status: 'error',
+        message:
+          error instanceof Error ? error.message : 'Unknown error occurred'
+      }
     }
   }
 }
