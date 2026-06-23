@@ -329,7 +329,6 @@ const correctRecord = async (
   })
 
   const updatedDeclaration = {
-    ...record?.declaration,
     'irisOutput.ucCode':
       row.ucCode || record?.declaration?.['irisOutput.ucCode'] || '',
     'irisOutput.selectedCodes':
