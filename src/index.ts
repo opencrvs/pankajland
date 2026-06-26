@@ -85,7 +85,8 @@ import { causeOfDeathSearchHandler } from './data-seeding/reference-data/handler
 import {
   createSpcCodingHandler,
   markSpcCodingProcessedHandler,
-  getPendingSpcCodingHandler
+  getPendingSpcCodingHandler,
+  notifySpcCodingHandler
 } from './api/spc-coding/handler'
 import {
   deathRecordCorrectionNotificationHandler,
@@ -545,6 +546,17 @@ export async function createServer() {
       },
       description:
         'Sends email notification to a user about their corrected death records with cause of death codes.'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/spc-coding/notification',
+    handler: notifySpcCodingHandler,
+    options: {
+      tags: ['api', 'spc-coding'],
+      description:
+        'Sends email notification to a user about their encoded death records that are ready to be imported.'
     }
   })
 

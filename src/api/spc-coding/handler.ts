@@ -1,6 +1,7 @@
 import { getClient } from './postgres'
 import { sql } from 'kysely'
 import Hapi from '@hapi/hapi'
+import { ProcessingResult, sendEmailNotifications } from './utils'
 
 type SpcCodingDatabaseRecord = {
   trackingId: string
@@ -164,5 +165,28 @@ export async function markSpcCodingProcessedHandler(
     request.log(['error'], err)
 
     return h.response({ error: 'Internal server error' }).code(500)
+  }
+}
+
+export async function notifySpcCodingHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const token = request.auth.artifacts.token as string
+  const results = request.payload as ProcessingResult[]
+  try {
+    await sendEmailNotifications(token, results)
+    return h
+      .response({
+        success: true,
+        msg: 'Successfully notified incoming SPC coded records'
+      })
+      .code(200)
+  } catch (err) {
+    request.log(['error'], err)
+
+    return h
+      .response({ error: 'Unable to notify about SPC coded records' })
+      .code(500)
   }
 }
