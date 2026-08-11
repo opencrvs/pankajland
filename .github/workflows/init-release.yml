@@ -119,7 +119,8 @@ jobs:
       # conflict-resolution commits do not land on the release branch itself.
       - name: Create merge-back branch for develop PR
         run: |
-          MERGEBACK_BRANCH="merge-back/release-${{ inputs.version }}-to-develop"
+          VERSION_NO_DOTS=$(echo "${{ inputs.version }}" | tr -d '.')
+          MERGEBACK_BRANCH="merge-back/release-${VERSION_NO_DOTS}-to-develop"
           if git ls-remote --exit-code --heads origin "$MERGEBACK_BRANCH" > /dev/null 2>&1; then
             echo "Branch $MERGEBACK_BRANCH already exists, skipping."
           else
@@ -143,7 +144,8 @@ jobs:
       - name: Create Pull Requests
         run: |
           PR_BRANCH="release/${{ inputs.version }}"
-          MERGEBACK_BRANCH="merge-back/release-${{ inputs.version }}-to-develop"
+          VERSION_NO_DOTS=$(echo "${{ inputs.version }}" | tr -d '.')
+          MERGEBACK_BRANCH="merge-back/release-${VERSION_NO_DOTS}-to-develop"
           TARGET_BRANCH="${{ steps.get_base_branch.outputs.target_branch }}"
 
           if [ -f .github/TEMPLATES/RELEASE_PR_TEMPLATE.md ]; then
