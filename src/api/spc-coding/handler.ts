@@ -1,6 +1,7 @@
 import { getClient } from './postgres'
 import { sql } from 'kysely'
 import Hapi from '@hapi/hapi'
+import { getRetryQueueEntries } from './retryQueue'
 
 type SpcCodingDatabaseRecord = {
   trackingId: string
@@ -160,6 +161,34 @@ export async function markSpcCodingProcessedHandler(
         results: updatedRows
       })
       .code(200)
+  } catch (err) {
+    request.log(['error'], err)
+
+    return h.response({ error: 'Internal server error' }).code(500)
+  }
+}
+
+/*
+ * Lists death registrations that failed to reach the SPC portal and are
+ * awaiting retry. `payload` is intentionally omitted from the response
+ */
+export async function getRetryQueueHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const entries = await getRetryQueueEntries()
+
+    const results = entries.map((entry) => ({
+      eventId: entry.eventId,
+      trackingId: entry.trackingId,
+      attempts: entry.attempts,
+      lastError: entry.lastError,
+      createdAt: entry.createdAt,
+      lastAttemptedAt: entry.lastAttemptedAt
+    }))
+
+    return h.response({ results }).code(200)
   } catch (err) {
     request.log(['error'], err)
 

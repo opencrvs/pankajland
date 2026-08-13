@@ -86,7 +86,8 @@ import { causeOfDeathSearchHandler } from './data-seeding/reference-data/handler
 import {
   createSpcCodingHandler,
   markSpcCodingProcessedHandler,
-  getPendingSpcCodingHandler
+  getPendingSpcCodingHandler,
+  getRetryQueueHandler
 } from './api/spc-coding/handler'
 import {
   deathRecordCorrectionNotificationHandler,
@@ -576,6 +577,17 @@ export async function createServer() {
     options: {
       tags: ['api', 'spc-coding'],
       description: 'Mark SPC coding rows as processed'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/spc-coding/retry-queue',
+    handler: getRetryQueueHandler,
+    options: {
+      tags: ['api', 'spc-coding'],
+      description:
+        'Lists death registrations that failed to reach the SPC portal and are awaiting retry'
     }
   })
 
