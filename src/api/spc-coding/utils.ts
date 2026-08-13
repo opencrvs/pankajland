@@ -9,6 +9,11 @@ import {
   symptomNumber
 } from '@countryconfig/events/death/forms/pages/causeOfDeathDetails'
 import { EventDocument, FieldUpdateValue } from '@opencrvs/toolkit/events'
+import { logger } from '@countryconfig/logger'
+import {
+  deleteRetryQueueEntryByEventId,
+  upsertFailedSubmission
+} from './retryQueue'
 
 type TokenResponse = { access_token: string; token_type: string }
 
@@ -23,7 +28,7 @@ export async function getAccessToken(
 
   const url = new URL('token', countryAuthBase)
 
-  console.log('Requesting access token from:', url.toString())
+  logger.info(`Requesting access token from: ${url.toString()}`)
   const res = await fetch(url.toString(), {
     method: 'POST',
     headers: {
@@ -33,7 +38,8 @@ export async function getAccessToken(
       client_id: clientId,
       client_secret: clientSecret,
       grant_type: 'client_credentials'
-    })
+    }),
+    signal: AbortSignal.timeout(10000)
   })
   if (!res.ok)
     throw new Error(`Token request failed: ${res.status} ${await res.text()}`)
@@ -166,7 +172,7 @@ export function extractCodFields(
   )
 }
 
-export async function sendRecordToSpcPortal(event: EventDocument) {
+export async function postSpcRecord(event: EventDocument): Promise<void> {
   const spcToken = await getAccessToken(
     SPC_CLIENT_ID || '',
     SPC_CLIENT_SECRET || '',
@@ -177,20 +183,44 @@ export async function sendRecordToSpcPortal(event: EventDocument) {
     SPC_COUNTRY_CONFIG_URL
   ).toString()
 
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${spcToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(event),
+    signal: AbortSignal.timeout(10000)
+  })
+
+  logger.info(`Response status from country API: ${response.status}`)
+
+  if (!response.ok) {
+    const body = await response.text()
+    throw new Error(
+      `Error response from country API: ${response.status} ${body}`
+    )
+  }
+}
+
+export async function sendRecordToSpcPortalOrEnqueue(
+  event: EventDocument
+): Promise<void> {
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${spcToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(event)
-    })
-    console.log('Response status from country API:', response.status)
-    if (!response.ok) {
-      console.error('Error response from country API:', await response.text())
+    await postSpcRecord(event)
+    try {
+      await deleteRetryQueueEntryByEventId(event.id)
+    } catch (dbError) {
+      logger.error('Failed to clear stale SPC retry queue entry', dbError)
     }
   } catch (error) {
-    console.error('Error sending data to country API:', error)
+    const message = error instanceof Error ? error.message : String(error)
+    logger.error('Error sending data to country API, queueing for retry', error)
+
+    try {
+      await upsertFailedSubmission(event.id, event.trackingId, event, message)
+    } catch (dbError) {
+      logger.error('Failed to enqueue SPC submission for retry', dbError)
+    }
   }
 }

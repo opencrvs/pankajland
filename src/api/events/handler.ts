@@ -23,7 +23,7 @@ import {
   causeOfDeathFields,
   extractCodFields,
   getSpcCompatibleEventDocument,
-  sendRecordToSpcPortal
+  sendRecordToSpcPortalOrEnqueue
 } from '../spc-coding/utils'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -78,7 +78,7 @@ export async function onCorrectionHandler(
         mergedDeclaration
       )
 
-      await sendRecordToSpcPortal(spcCompatibleEventDocument)
+      await sendRecordToSpcPortalOrEnqueue(spcCompatibleEventDocument)
     }
   }
   return h.response().code(200)
@@ -126,7 +126,7 @@ export async function onNotificationHandler(
       eventWithAcceptedNotifyAction,
       notificationDeclaration
     )
-    await sendRecordToSpcPortal(spcCompatibleEventDocument)
+    await sendRecordToSpcPortalOrEnqueue(spcCompatibleEventDocument)
   } else {
     console.log(
       'Notification declaration is missing required fields or symptoms, skipping sending to SPC'

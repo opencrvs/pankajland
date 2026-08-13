@@ -60,3 +60,16 @@ export async function getRetryQueueEntries(): Promise<RetryQueueEntry[]> {
     lastAttemptedAt: row.lastAttemptedAt
   }))
 }
+
+export async function deleteRetryQueueEntryByEventId(
+  eventId: string
+): Promise<boolean> {
+  const db = getClient()
+
+  const result = await db
+    .deleteFrom('spc.outbound_retry_queue')
+    .where('eventId', '=', eventId)
+    .executeTakeFirst()
+
+  return Number(result.numDeletedRows) > 0
+}
