@@ -87,7 +87,8 @@ import {
   createSpcCodingHandler,
   markSpcCodingProcessedHandler,
   getPendingSpcCodingHandler,
-  getRetryQueueHandler
+  getRetryQueueHandler,
+  processRetryQueueHandler
 } from './api/spc-coding/handler'
 import {
   deathRecordCorrectionNotificationHandler,
@@ -588,6 +589,17 @@ export async function createServer() {
       tags: ['api', 'spc-coding'],
       description:
         'Lists death registrations that failed to reach the SPC portal and are awaiting retry'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/spc-coding/retry-queue/process',
+    handler: processRetryQueueHandler,
+    options: {
+      tags: ['api', 'spc-coding'],
+      description:
+        'Manually triggers the retry of all queued failed SPC submissions'
     }
   })
 
