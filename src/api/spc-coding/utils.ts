@@ -14,6 +14,9 @@ import {
   deleteRetryQueueEntryByEventId,
   upsertFailedSubmission
 } from './retryQueue'
+import { sendEmail } from '../notification/email-service'
+import { ALERT_EMAIL, SENDER_EMAIL_ADDRESS } from '../notification/constant'
+import { applicationConfig } from '../application/application-config'
 
 type TokenResponse = { access_token: string; token_type: string }
 
@@ -222,5 +225,36 @@ export async function sendRecordToSpcPortalOrEnqueue(
     } catch (dbError) {
       logger.error('Failed to enqueue SPC submission for retry', dbError)
     }
+
+    try {
+      if (process.env.NODE_ENV === 'development') {
+        logger.info(
+          `Would send email to admin about failed record submission to the SPC portal`
+        )
+        return
+      }
+      await sendSpcDownAlertEmail(event.trackingId)
+    } catch (emailError) {
+      logger.error('Failed to send SPC-down alert email', emailError)
+    }
   }
+}
+
+export async function sendSpcDownAlertEmail(trackingId: string) {
+  const applicationName = applicationConfig.APPLICATION_NAME || 'OpenCRVS'
+  const emailBody = `
+      <p>Dear admin,</p>
+      <p>Pankajland failed to submit a record to the SPC portal.</p>
+      <ul>
+        <li>Tracking ID: ${trackingId}</li>
+      </ul>
+      <p>See the retry queue for details: GET /spc-coding/retry-queue</p>
+      <p>Best regards,<br>${applicationName}</p>
+    `
+  await sendEmail({
+    subject: 'SPC communication down — event failed to submit',
+    from: SENDER_EMAIL_ADDRESS,
+    to: ALERT_EMAIL,
+    html: emailBody
+  })
 }
