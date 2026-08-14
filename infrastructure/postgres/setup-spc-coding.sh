@@ -62,7 +62,9 @@ CREATE TABLE IF NOT EXISTS spc.coding (
   processed_by_system TIMESTAMPTZ NULL
 );
 
--- Records of death registrations that failed to reach the SPC portal
+-- Records of death registrations that failed to reach the SPC portal, retried
+-- until they succeed or are manually discarded. A row is deleted once its
+-- retry succeeds; see src/api/spc-coding/retryQueue.ts.
 CREATE TABLE IF NOT EXISTS spc.outbound_retry_queue (
   event_id TEXT PRIMARY KEY,
   tracking_id TEXT,

@@ -63,13 +63,21 @@ export async function getRetryQueueEntries(): Promise<RetryQueueEntry[]> {
 
 export async function deleteRetryQueueEntryByEventId(
   eventId: string
-): Promise<boolean> {
+): Promise<Omit<RetryQueueEntry, 'payload'> | undefined> {
   const db = getClient()
 
-  const result = await db
+  const row = await db
     .deleteFrom('spc.outbound_retry_queue')
     .where('eventId', '=', eventId)
+    .returning([
+      'eventId',
+      'trackingId',
+      'attempts',
+      'lastError',
+      'createdAt',
+      'lastAttemptedAt'
+    ])
     .executeTakeFirst()
 
-  return Number(result.numDeletedRows) > 0
+  return row
 }

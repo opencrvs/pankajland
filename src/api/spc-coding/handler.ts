@@ -2,7 +2,10 @@ import { getClient } from './postgres'
 import { sql } from 'kysely'
 import Hapi from '@hapi/hapi'
 import { processSpcRetryQueue } from './retryProcessor'
-import { getRetryQueueEntries } from './retryQueue'
+import {
+  deleteRetryQueueEntryByEventId,
+  getRetryQueueEntries
+} from './retryQueue'
 
 type SpcCodingDatabaseRecord = {
   trackingId: string
@@ -197,10 +200,6 @@ export async function getRetryQueueHandler(
   }
 }
 
-/*
- * Manually triggers a retry pass over all queued failed SPC submissions, so
- * an operator doesn't have to wait after fixing an SPC outage.
- */
 export async function processRetryQueueHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -208,6 +207,25 @@ export async function processRetryQueueHandler(
   try {
     const result = await processSpcRetryQueue()
     return h.response(result).code(200)
+  } catch (err) {
+    request.log(['error'], err)
+    return h.response({ error: 'Internal server error' }).code(500)
+  }
+}
+
+export async function deleteRetryQueueEntryHandler(
+  request: Hapi.Request<{ Params: { eventId: string } }>,
+  h: Hapi.ResponseToolkit<{ Params: { eventId: string } }>
+) {
+  const { eventId } = request.params
+  try {
+    const entry = await deleteRetryQueueEntryByEventId(eventId)
+    if (!entry) {
+      return h
+        .response({ error: `No retry queue entry found for event ${eventId}` })
+        .code(404)
+    }
+    return h.response({ result: entry }).code(200)
   } catch (err) {
     request.log(['error'], err)
     return h.response({ error: 'Internal server error' }).code(500)
