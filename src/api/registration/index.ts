@@ -23,7 +23,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { sendInformantNotification } from '../notification/informantNotification'
 import {
   getSpcCompatibleEventDocument,
-  sendRecordToSpcPortal
+  sendRecordToSpcPortalOrEnqueue
 } from '../spc-coding/utils'
 
 export interface ActionConfirmationRequest extends Hapi.Request {
@@ -96,7 +96,7 @@ export async function onRegisterHandler(
         event,
         declaration
       )
-      await sendRecordToSpcPortal(spcCompatibleEventDocument)
+      await sendRecordToSpcPortalOrEnqueue(spcCompatibleEventDocument)
     }
   }
 
