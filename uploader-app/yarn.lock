@@ -652,11 +652,11 @@
     clsx "^2.1.1"
 
 "@mantine/dropzone@^8.3.14":
-  version "8.3.14"
-  resolved "https://registry.npmjs.org/@mantine/dropzone/-/dropzone-8.3.14.tgz"
-  integrity sha512-+wpsiLMqhyJMRxFj+q+wTZ+xk8VAH/5TBojjFcvt9riDn/ujGYpWZ7j+RFbmRVHOqcG0mkbCVUzCyPywuYjqLQ==
+  version "8.3.18"
+  resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-8.3.18.tgz#abc9e4b35fc4c18041ba6f6f3b574935a1d6e03f"
+  integrity sha512-GaYUUl/382R7hl1g6heTCZ5a6T5x6qYPg0oID6ik/J0j7e5+XMZyTH5ITpaqpsBQ09GKKsF5y3iNehpSby8Kew==
   dependencies:
-    react-dropzone "14.3.8"
+    react-dropzone "15.0.0"
 
 "@mantine/form@^7.16.0":
   version "7.17.8"
@@ -2564,10 +2564,10 @@ react-dom@^18.3.1:
     loose-envify "^1.1.0"
     scheduler "^0.23.2"
 
-react-dropzone@14.3.8:
-  version "14.3.8"
-  resolved "https://registry.npmjs.org/react-dropzone/-/react-dropzone-14.3.8.tgz"
-  integrity sha512-sBgODnq+lcA4P296DY4wacOZz3JFpD99fp+hb//iBO2HHnyeZU3FwWyXJ6salNpqQdsZrgMrotuko/BdJMV8Ug==
+react-dropzone@15.0.0:
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-15.0.0.tgz#bd03c7c2b14fe4ea9db1a9c74502b85339f2e505"
+  integrity sha512-lGjYV/EoqEjEWPnmiSvH4v5IoIAwQM2W4Z1C0Q/Pw2xD0eVzKPS359BQTUMum+1fa0kH2nrKjuavmTPOGhpLPg==
   dependencies:
     attr-accept "^2.2.4"
     file-selector "^2.1.0"
