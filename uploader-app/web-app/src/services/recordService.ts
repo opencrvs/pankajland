@@ -190,6 +190,10 @@ export function getCreatedByFromLegalStatuses(
   if (declaredStatus?.createdBy) {
     return declaredStatus.createdBy
   }
+  const notifiedStatus = legalStatuses['NOTIFIED']
+  if (notifiedStatus?.createdBy) {
+    return notifiedStatus.createdBy
+  }
 
   return null
 }
@@ -253,7 +257,7 @@ async function sendEmailNotifications(
 ): Promise<void> {
   // Filter successful or rejected results that have a createdBy user
   const successfulResults = results.filter(
-    (r) => r.status === 'success' && r.createdBy
+    (r) => (r.status === 'success' || r.status === 'rejected') && r.createdBy
   )
 
   if (successfulResults.length === 0) {
@@ -269,6 +273,7 @@ async function sendEmailNotifications(
       const record: RecordsToEmail = {
         status: result.status,
         trackingId: result.trackingId || result.id,
+        message: result.message,
         ...(result.causesOfDeath ? { ucCode: result.causesOfDeath } : {})
       }
 
@@ -499,6 +504,17 @@ export const processRecord = async (
         trackingId
       }
     }
+    if (row.status === 'Rejected') {
+      return {
+        rowIndex,
+        id: trackingId,
+        status: 'rejected',
+        message: `${irisRejectionReason}`,
+        causesOfDeath,
+        createdBy: createdBy || undefined,
+        trackingId
+      }
+    }
     return {
       rowIndex,
       id: trackingId,
@@ -558,7 +574,7 @@ export const processRecords = async (
     results.push(result)
   }
 
-  const successfulResults = results.filter((r) => r.status === 'success')
+  const successfulResults = results.filter((r) => r.status === 'success' || r.status === 'rejected')
   const successfulResultsIds = successfulResults.map((r) => r.id)
 
   await markSPCCodedRecordsAsProcessed(successfulResultsIds, token)
@@ -568,7 +584,7 @@ export const processRecords = async (
     successful: results.filter((r) => r.status === 'success').length,
     skipped: results.filter((r) => r.status === 'skipped').length,
     errors: results.filter((r) => r.status === 'error').length,
-    /* rejected: results.filter((r) => r.status === 'rejected').length, */
+    rejected: results.filter((r) => r.status === 'rejected').length,
     results
   }
 
