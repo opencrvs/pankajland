@@ -13,7 +13,7 @@
     "build": "yarn workspace web-app build"
   },
   "dependencies": {
-    "@opencrvs/toolkit": "1.9.11-rc.5ee5281"
+    "@opencrvs/toolkit": "1.9.16"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
