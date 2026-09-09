@@ -1147,10 +1147,10 @@
   resolved "https://registry.npmjs.org/@types/estree/-/estree-1.0.6.tgz"
   integrity sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==
 
-"@types/fhir@^0.0.30":
-  version "0.0.30"
-  resolved "https://registry.npmjs.org/@types/fhir/-/fhir-0.0.30.tgz"
-  integrity sha512-vDU62tUFeAYBVQThiWAfGd6D25TiLLDDS5pV19vim52FLpwWTBliLMvotbF4D/U+BmjxBKIuHGZgFnoh/HtV5g==
+"@types/fhir@^0.0.44":
+  version "0.0.44"
+  resolved "https://registry.yarnpkg.com/@types/fhir/-/fhir-0.0.44.tgz#38d8985e7d37a3111db437c453ec2589738baf52"
+  integrity sha512-RhqRUNcUFeQSbEK9cOEYQ98sfsUFFRCUKbgozHvryiUfEAPiXuhgk2wqYV3MoD1T1qHp0gztrHDywU68bN7KYQ==
 
 "@types/geojson@^7946.0.4":
   version "7946.0.12"
