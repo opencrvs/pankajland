@@ -22,7 +22,7 @@ const renderSection = (
       ${records
         .map(
           (record) =>
-            `<li>TrackingID: ${record.trackingId} ${record.ucCode ? ` / UC Code: ${record.ucCode}` : ''}</li>`
+            `<li>TrackingID: ${record.trackingId} ${record.ucCode ? ` / UC Code: ${record.ucCode}` : record.message ? ` / Message: ${record.message}` : ''}</li>`
         )
         .join('')}
     </ul>
@@ -62,7 +62,7 @@ export async function sendCoDEmail(
     (r) => r.status === 'success' && r.ucCode
   )
   const rejectedRecords = payload.records.filter(
-    (r) => r.status === 'success' && !r.ucCode
+    (r) => r.status === 'rejected' && !r.ucCode
   )
 
   const applicationName = applicationConfig.APPLICATION_NAME || 'OpenCRVS'

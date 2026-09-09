@@ -30,7 +30,8 @@ export const deathRecordCorrectionNotificationSchema = Joi.object({
           .valid('success', 'rejected', 'corrected')
           .required(),
         trackingId: Joi.string().required(),
-        ucCode: Joi.string().optional()
+        ucCode: Joi.string().optional(),
+        message: Joi.string().optional()
       })
     )
     .min(1)
@@ -43,6 +44,8 @@ export interface RecordsToEmail {
   trackingId?: string
   /** The uc code of the record for display in emails */
   ucCode?: string
+  /** The message for the record for display in emails */
+  message?: string
 }
 
 export interface DeathRecordCorrectionNotificationPayload {

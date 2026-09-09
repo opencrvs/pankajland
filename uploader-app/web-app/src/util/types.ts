@@ -4,7 +4,7 @@ export type Role = 'Registrar'
 export interface ProcessingResult {
   rowIndex: number;
   id: string;
-  status: 'success' | 'skipped' | 'error';
+  status: 'success' | 'skipped' | 'error' | 'rejected';
   message: string;
   causesOfDeath?: string;
   irisRejectionReason?: string;
@@ -14,16 +14,18 @@ export interface ProcessingResult {
 }
 
 export interface RecordsToEmail {
-  status: 'success' | 'skipped' | 'error'
+  status: 'success' | 'skipped' | 'error' | 'rejected'
   /** The tracking ID of the record for display in emails */
   trackingId?: string
   /** The uc code of the record for display in emails */
   ucCode?: string
+  message?: string
 }
 
 export interface ProcessingSummary {
   total: number;
   successful: number;
+  rejected: number;
   skipped: number;
   errors: number;
   results: ProcessingResult[];
