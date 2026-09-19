@@ -2000,9 +2000,9 @@ hasown@^2.0.2:
     function-bind "^1.1.2"
 
 hono@^4.6.17:
-  version "4.11.4"
-  resolved "https://registry.npmjs.org/hono/-/hono-4.11.4.tgz"
-  integrity sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==
+  version "4.13.8"
+  resolved "https://registry.yarnpkg.com/hono/-/hono-4.13.8.tgz#fdb2b060c31cafa559ebc8f8b04ab4970e659abe"
+  integrity sha512-/Gng7NfoykZl2pjukW5Z6+8Yxm3BPRf86GTbQnt0SbySkvax4fyL4H3HhY1cCpBGmiW9XDRFzRV+CXK2W8QudQ==
 
 ignore@^5.2.0:
   version "5.3.2"
